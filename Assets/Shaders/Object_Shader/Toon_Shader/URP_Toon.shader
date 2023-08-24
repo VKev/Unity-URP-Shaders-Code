@@ -3,18 +3,14 @@ Shader "MyCustom_URP_Shader/URP_Toon"
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
-        _BaseColor("Base Color", Color) = (1, 1, 1, 1)
-        _DeffuseBlur("Deffuse Blur",Range(0,1))= 0
-        _SpecularBlur("Specular Blur",Range(0.05,1)) = 0.06
-        _AmbientColor("Ambient Color", Color) = (0, 0, 0, 0)
+        _BaseColor("Base Color", COLOR) = (1, 1, 1, 1)
+        _AmbientColor("Ambient Color", COLOR) = (0,0,0,0)
+        _Gloss("Glossity", float) = 1
         _RimSize("Rim Size", Range(0,1))=0.2
-        _RimBlur("Rim Blur", Range(0,0.1))= 0.01
-        _RimThreshold("Rim Threshold", Range(0.01,10))= 2
-        _ShadowBlur("Shadow Blur",Range(0,1)) = 0
-        _ShadowThreshold("Shadow Threshold", Range(0,1)) = 0
-        _ShadowIntensity("Shadow intensity",float) = 1
-        _SpecularSmoothness("Specular Smooth", float) = 0
-        _Metalness("Metalness", Range(0,1)) = 0
+        _LightMaxIntensity("Light Max receiver Intensity", float) = 0
+        _MainLightShadowIntensity("Main light shadow receiver intensity",float) = 1
+        [HideInInspector]_RimBlur("Rim Blur", Range(0,0.1))= 0.01
+        [HideInInspector]_RimThreshold("Rim Threshold", Range(0.01,10))= 2
     }
     SubShader
     {
@@ -34,12 +30,16 @@ Shader "MyCustom_URP_Shader/URP_Toon"
             //specular of UniversalFragmentBlinnPhong only work with this define
             #define _SPECULAR_COLOR
 
+            #define USE_STRUCTURED_BUFFER_FOR_LIGHT_DATA
+            #define _LIGHT_COOKIES
             //cal light shadow for main light and enable cascade
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE
 
             //supprot multiple light
-            //#pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
-            //#pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
+            #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
+            #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
+            #define ADDITIONAL_LIGHT_CALCULATE_SHADOWS
+            #define USE_STRUCTURED_BUFFER_FOR_LIGHT_DATA
 
             //enable soft shadow
             #pragma multi_compile_fragment _ _SHADOWS_SOFT
@@ -47,37 +47,26 @@ Shader "MyCustom_URP_Shader/URP_Toon"
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
-            #include "CustomCore.hlsl"
-
-            #include "ForwardToon_Pass.hlsl"
+            #include "Assets/VkevShaderLib.hlsl"
+            
+            #include "Toon_ForwardLit_Pass.hlsl"
 
             ENDHLSL
         }
-        
 
-        Pass {
-            // The shadow caster pass, which draws to shadow maps
-            Name "ShadowCaster"
-            Tags{"LightMode" = "ShadowCaster"}
-
+        Pass{
+            name "ShadowCaster"
+            Tags{"LightMode"= "ShadowCaster"}
             ColorMask 0 // No color output, only depth
-            Cull [_Cull]
+            
 
             HLSLPROGRAM
             #pragma vertex vert
             #pragma fragment frag
 
-
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
-            #pragma shader_feature_local _ALPHA_CUTOUT
-            #pragma shader_feature_local _DOUBLE_SIDED_NORMALS
-            //supprot multiple light
-            #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
-            #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
-
-            #include "ShadowToon_Pass.hlsl"
-
+            #include "Toon_ShadowCaster_Pass.hlsl"
             ENDHLSL
         }
     }

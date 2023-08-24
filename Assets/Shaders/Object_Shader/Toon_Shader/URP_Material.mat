@@ -30,7 +30,10 @@ Material:
     m_Ints: []
     m_Floats:
     - _DeffuseBlur: 0.005
+    - _Gloss: 1
+    - _LightMaxIntensity: 0.4
     - _MainLightIntensity: 1
+    - _MainLightShadowIntensity: 0.4
     - _Metalness: 1
     - _RimBlur: 0.01
     - _RimSize: 0.2
@@ -41,7 +44,7 @@ Material:
     - _SpecularBlur: 0.05
     - _SpecularSmoothness: 0.87
     m_Colors:
-    - _AmbientColor: {r: 0.5377358, g: 0.5377358, b: 0.5377358, a: 0}
-    - _BaseColor: {r: 0.7169812, g: 0.7169812, b: 0.7169812, a: 1}
+    - _AmbientColor: {r: 1, g: 1, b: 1, a: 0}
+    - _BaseColor: {r: 0.7924528, g: 0.7924528, b: 0.7924528, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
