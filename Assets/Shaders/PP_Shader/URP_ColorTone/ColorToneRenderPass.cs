@@ -12,7 +12,7 @@ internal class ColorToneRenderPass : ScriptableRenderPass
 
     public ColorToneRenderPass(Material material)
     {
-        m_Material = new Material(Shader.Find("MyCustom_URP_Shader/URP_Outline"));
+        m_Material = new Material(Shader.Find("MyCustom_URP_Shader/URP_ColorTone"));
 
 
         renderPassEvent = RenderPassEvent.BeforeRenderingPostProcessing;
