@@ -52,7 +52,6 @@
 
                 float3 deffuseLight = DeffuseLight(N,light);
                 deffuseLight = smoothstep(0,0.01, deffuseLight );
-
                 
 
                 float3 specularLight = SpecularLight(N,wPos,_Gloss,light);
@@ -77,21 +76,25 @@
                 float3 N = normalize(i.normalWS);
                 float3 wPos = i.positionWS;
                 float3 V = GetWorldSpaceNormalizeViewDir(wPos);
+
+
                 InputData inputdata = (InputData)0;
                 float4 shadowMask = CalculateShadowMask(inputdata);
 
+                
                 float4 shadowcoord = TransformWorldToShadowCoord(wPos);
-                Light mainLight = GetMainLight(shadowcoord); //get mainlight + shadow main light
+                Light mainLight = GetMainLight(shadowcoord);
                 mainLight.shadowAttenuation *= _MainLightShadowIntensity;
-                
-                
+
+
+
                 float3 baseColor = _BaseColor.rgb*mainTex.xyz*generateToonLightBlinnPhong(N,wPos,V,mainLight);
                 
 
 
                 LightingData lightingData = (LightingData)0;
-
                 lightingData.mainLightColor  += baseColor;
+
                 #if defined(_ADDITIONAL_LIGHTS)
                     uint pixelLightCount = GetAdditionalLightsCount();
                     for (uint lightIndex = 0; lightIndex < pixelLightCount; lightIndex++)
@@ -103,6 +106,7 @@
                         
                     }
                 #endif
+                
 
 
                 //return float4(additionalColor,1) ;

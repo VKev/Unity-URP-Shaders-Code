@@ -83,7 +83,7 @@
                 surfaceData.smoothness = _SpecularSmoothness;
                 surfaceData.normalTS = normalTS;
                 surfaceData.metallic = _Metalness;
-                surfaceData.emission = tex2D(_EmissionMap,i.uv)*_EmissionColor;
+                surfaceData.emission = tex2D(_EmissionMap,i.uv).xyz*_EmissionColor.rgb;
                 //return float4 (_LightDirection,1);
                 //return float4(normalWS,1);
                 return UniversalFragmentBlinnPhong(inputData , surfaceData);

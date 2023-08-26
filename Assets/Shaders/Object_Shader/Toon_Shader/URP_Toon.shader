@@ -30,7 +30,7 @@ Shader "MyCustom_URP_Shader/URP_Toon"
             //specular of UniversalFragmentBlinnPhong only work with this define
             #define _SPECULAR_COLOR
 
-            #define USE_STRUCTURED_BUFFER_FOR_LIGHT_DATA
+            
             #define _LIGHT_COOKIES
             //cal light shadow for main light and enable cascade
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE
@@ -39,7 +39,8 @@ Shader "MyCustom_URP_Shader/URP_Toon"
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
             #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
             #define ADDITIONAL_LIGHT_CALCULATE_SHADOWS
-            #define USE_STRUCTURED_BUFFER_FOR_LIGHT_DATA
+
+            //#define USE_STRUCTURED_BUFFER_FOR_LIGHT_DATA
 
             //enable soft shadow
             #pragma multi_compile_fragment _ _SHADOWS_SOFT

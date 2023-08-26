@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: URP_Material
-  m_Shader: {fileID: 4800000, guid: 1670e47852f0dd243a2e71dc1b95898b, type: 3}
+  m_Name: URP_ColorTone
+  m_Shader: {fileID: 4800000, guid: 07da4ac3f52eb624db7e3023957349c0, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -29,22 +29,11 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _DeffuseBlur: 0.005
-    - _Gloss: 1
-    - _LightMaxIntensity: 0.4
-    - _MainLightIntensity: 1
-    - _MainLightShadowIntensity: 0.4
-    - _Metalness: 1
-    - _RimBlur: 0.01
-    - _RimSize: 0.2
-    - _RimThreshold: 2
-    - _ShadowBlur: 0.005
-    - _ShadowIntensity: 1
-    - _ShadowThreshold: 0
-    - _SpecularBlur: 0.05
-    - _SpecularSmoothness: 0.87
+    - _DepthThreshold: 0.05
+    - _NormalThreshold: 0.3
+    - _OutlineSize: 1
+    - _Scale: 1
     m_Colors:
-    - _AmbientColor: {r: 1, g: 1, b: 1, a: 0}
-    - _BaseColor: {r: 0.7924528, g: 0.7924528, b: 0.7924528, a: 1}
+    - _OutlineColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
