@@ -1,8 +1,7 @@
-Shader "MyCustom_URP_Shader/URP_ColorTone"
+Shader "MyCustom_URP_Shader/URP_CameraViewPP"
 {
     Properties
     {
-        _ColorTone("Color", COLOR) = (0.5625,0.5625,0.5625,1)
         //_NormalThreshold("Normal Threshold", Range(0,1))= 0.3
         //_DepthThreshold("Depth Threshold",float)= 0.05
 
@@ -22,7 +21,7 @@ Shader "MyCustom_URP_Shader/URP_ColorTone"
             //Cull Front
             HLSLPROGRAM
 
-
+            #define _GBUFFER_NORMALS_OCT
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/DynamicScaling.hlsl"
 
@@ -47,10 +46,13 @@ Shader "MyCustom_URP_Shader/URP_ColorTone"
                 float2 uv   : TEXCOORD0;
             };
 
+
             Varyings vert(Attributes v)
             {
                 Varyings o;
-
+                //float depth = tex2D(_CameraDepthTexture,i.uv).r;//depth texture
+                //float3 worldPos = ComputeWorldSpacePosition(i.uv, depth, UNITY_MATRIX_I_VP);//World Pos texture
+                //float3 worldNormal = normalize(cross(ddx(worldPos), ddy(worldPos)));//Approximate worldnormal texture
                 float4 pos = GetFullScreenTriangleVertexPosition(v.vertexID);
                 float2 uv  = GetFullScreenTriangleTexCoord(v.vertexID);
 
@@ -61,8 +63,9 @@ Shader "MyCustom_URP_Shader/URP_ColorTone"
             }
 
 
-            sampler2D _CameraDepthTexture;
+            //sampler2D _CameraDepthTexture;
             sampler2D _CameraOpaqueTexture;
+            //sampler2D _CameraNormalsTexture;
             
             //declare Properties in CBUFFER
             CBUFFER_START(UnityPerMaterial)
@@ -82,7 +85,8 @@ Shader "MyCustom_URP_Shader/URP_ColorTone"
                 //float3 worldNormal = normalize(cross(ddx(worldPos), ddy(worldPos)));//Approximate worldnormal texture
                 float4 Col = tex2D(_CameraOpaqueTexture, i.uv);
 
-                return Col*_ColorTone;
+                return Col;
+                //return float4(depth.xxx,1);
                 //return float4(worldNormal,1);
                 //return UniversalFragmentBlinnPhong(inputData , surfaceData);
             }
