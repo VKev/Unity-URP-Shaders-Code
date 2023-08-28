@@ -54,6 +54,7 @@ public class MyPostProcessRenderFeature : ScriptableRendererFeature
                     outlineMat.SetFloat("_OutlineSize", (float)outlineVolumeSetting.outlineSize);
                     outlineMat.SetFloat("_DepthThreshold", (float)outlineVolumeSetting.depthThreshold);
                     outlineMat.SetFloat("_NormalThreshold", (float)outlineVolumeSetting.normalThreshold);
+                    outlineMat.SetFloat("_FresnelStrength", (float)outlineVolumeSetting.fresnelStrength);
                     outlineMat.SetColor("_OutlineColor", (Color)outlineVolumeSetting.outlineColor);
                     cmd.Blit(source.nameID, destination);
                     cmd.Blit(destination, source.nameID, outlineMat);

@@ -15,16 +15,19 @@ MonoBehaviour:
   active: 1
   outlineSize:
     m_OverrideState: 1
-    m_Value: 1.07
+    m_Value: 1
+  outlineColor:
+    m_OverrideState: 1
+    m_Value: {r: 1, g: 1, b: 1, a: 1}
   depthThreshold:
     m_OverrideState: 1
     m_Value: 1
   normalThreshold:
     m_OverrideState: 1
-    m_Value: 0.5
-  outlineColor:
+    m_Value: 0.7
+  fresnelStrength:
     m_OverrideState: 1
-    m_Value: {r: 0, g: 0, b: 0, a: 1}
+    m_Value: 3.5
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -70,7 +73,7 @@ MonoBehaviour:
     m_Value: 65472
   tint:
     m_OverrideState: 1
-    m_Value: {r: 1, g: 1, b: 1, a: 1}
+    m_Value: {r: 1, g: 0.48490566, b: 0.48490566, a: 1}
   highQualityFiltering:
     m_OverrideState: 0
     m_Value: 0

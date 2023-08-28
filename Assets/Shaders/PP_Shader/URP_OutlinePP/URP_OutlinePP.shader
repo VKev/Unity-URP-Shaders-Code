@@ -7,6 +7,7 @@ Shader "MyCustom_URP_Shader/URP_OutlinePP"
         _OutlineColor("Outline Color", COLOR) = (0.5625,0.5625,0.5625,1)
         _NormalThreshold("Normal Threshold", Range(0,1))= 0.3
         _DepthThreshold("Depth Threshold",float)= 0.05
+        _FresnelStrength("Fresnel Strength", float) = 1
 
     }
     SubShader
@@ -20,7 +21,7 @@ Shader "MyCustom_URP_Shader/URP_OutlinePP"
 
         Pass
         {
-            
+            Blend SrcAlpha OneMinusSrcAlpha   
             HLSLPROGRAM
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
@@ -62,7 +63,7 @@ Shader "MyCustom_URP_Shader/URP_OutlinePP"
             sampler2D _CameraOpaqueTexture;
             float4 _CameraOpaqueTexture_TexelSize;
             float4 _OutlineColor;
-            float _OutlineSize,_NormalThreshold,_DepthThreshold;
+            float _OutlineSize,_NormalThreshold,_DepthThreshold,_FresnelStrength;
             //sampler2D _CameraNormalsTexture;
             
             //declare Properties in CBUFFER
@@ -102,12 +103,12 @@ Shader "MyCustom_URP_Shader/URP_OutlinePP"
                 float3 worldPos = ComputeWorldSpacePosition(i.uv, cameraDepthTexture, UNITY_MATRIX_I_VP);//World Pos texture
                 float3 V = GetWorldSpaceNormalizeViewDir(worldPos);
                 float2 screenSpaceUV = i.uv;
-                float fresnel = 1-saturate(dot(V,cameraWorldNormalTexture));
+                float fresnel = (1-saturate(dot(V,cameraWorldNormalTexture)))*_FresnelStrength;
                 //world normal tex improve 
                 
                 
-                float normalThreshold = (1 + fresnel)*(1-_NormalThreshold);
-                float depthThreshold = _DepthThreshold*( 1 + fresnel) ;
+                float normalThreshold = (_NormalThreshold);
+                float depthThreshold = _DepthThreshold*(1 + fresnel) ;
 
 
                 float halfScaleFloor = floor(_OutlineSize * 0.5);
