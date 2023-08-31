@@ -64,6 +64,23 @@ MonoBehaviour:
   m_CopyDepthMode: 1
   m_AccurateGbufferNormals: 0
   m_IntermediateTextureMode: 1
+--- !u!114 &3560109108236106854
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51b019413ef7f6f47a0159ba9f19a704, type: 3}
+  m_Name: test
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  material: {fileID: 2100000, guid: bdad16bb4f0f6954d87e41818aa5298c, type: 2}
+  DrawOpaque_renderPassEvent: 300
+  layerMask:
+    m_Bits: 4294967295
 --- !u!114 &9203833478308372706
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -78,3 +95,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Active: 1
   renderPassEvent: 550
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 64

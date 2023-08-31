@@ -2,12 +2,10 @@ Shader "MyCustom_URP_Shader/URP_OutlinePP"
 {
     Properties
     {
-        
         _OutlineSize ("Scale", float) = 1
         _OutlineColor("Outline Color", COLOR) = (0.5625,0.5625,0.5625,1)
         _NormalThreshold("Normal Threshold", Range(0,1))= 0.3
         _DepthThreshold("Depth Threshold",float)= 0.05
-        _FresnelStrength("Fresnel Strength", float) = 1
 
     }
     SubShader
@@ -58,20 +56,21 @@ Shader "MyCustom_URP_Shader/URP_OutlinePP"
                 return o;
             }
 
-
-            sampler2D _CameraDepthTexture;
+            //sampler2D _CameraDepthTexture;
             sampler2D _CameraOpaqueTexture;
             float4 _CameraOpaqueTexture_TexelSize;
-            float4 _OutlineColor;
-            float _OutlineSize,_NormalThreshold,_DepthThreshold,_FresnelStrength;
+            
+            //sampler2D _CustomOpaqueTexture;
+            sampler2D _CustomDepthTexture;
+            //float4 _CustomOpaqueTexture_TexelSize;
             //sampler2D _CameraNormalsTexture;
             
             //declare Properties in CBUFFER
             CBUFFER_START(UnityPerMaterial)
-                
                 sampler2D _MainTex;
                 float4 _ColorTone;
-                
+                float4 _OutlineColor;
+                float _OutlineSize,_NormalThreshold,_DepthThreshold;
             CBUFFER_END
 
             float3 sampleWorldNormal(float2 uv)
@@ -80,9 +79,9 @@ Shader "MyCustom_URP_Shader/URP_OutlinePP"
                 float2 uv1 = uv + float2(_CameraOpaqueTexture_TexelSize.x, 0); // right 
                 float2 uv2 = uv + float2(0, _CameraOpaqueTexture_TexelSize.y); // top
 
-                float depthCenter = tex2D(_CameraDepthTexture,uv0).r;
-                float depthRight = tex2D(_CameraDepthTexture,uv1).r;
-                float depthUp = tex2D(_CameraDepthTexture,uv2).r;
+                float depthCenter = tex2D(_CustomDepthTexture,uv0).r;
+                float depthRight = tex2D(_CustomDepthTexture,uv1).r;
+                float depthUp = tex2D(_CustomDepthTexture,uv2).r;
 
                 float3 P0 = ComputeWorldSpacePosition(uv0, depthCenter, UNITY_MATRIX_I_VP);
                 float3 P1 = ComputeWorldSpacePosition(uv1, depthRight, UNITY_MATRIX_I_VP);
@@ -96,19 +95,19 @@ Shader "MyCustom_URP_Shader/URP_OutlinePP"
             half4 frag(Varyings i) : SV_Target//get front face of object
             {
                 //float4 mainTex = tex2D(_MainTex,i.uv);
-                float cameraDepthTexture = tex2D(_CameraDepthTexture,i.uv).r;//depth texture
+                float cameraDepthTexture = tex2D(_CustomDepthTexture,i.uv).r;//depth texture
                 float4 cameraColorTexture = tex2D(_CameraOpaqueTexture,i.uv);//SampleSceneNormals( i.uv);
-                float3 cameraWorldNormalTexture = sampleWorldNormal(i.uv);
+                float3 cameraWorldNormalTexture = sampleWorldNormal(i.uv); 
                 //float depth = SampleSceneDepth(i.uv);//depth texture
                 float3 worldPos = ComputeWorldSpacePosition(i.uv, cameraDepthTexture, UNITY_MATRIX_I_VP);//World Pos texture
                 float3 V = GetWorldSpaceNormalizeViewDir(worldPos);
                 float2 screenSpaceUV = i.uv;
-                float fresnel = (1-saturate(dot(V,cameraWorldNormalTexture)))*_FresnelStrength;
+                float fresnel = saturate(dot(V,cameraWorldNormalTexture));
                 //world normal tex improve 
                 
                 
                 float normalThreshold = (_NormalThreshold);
-                float depthThreshold = _DepthThreshold*(1 + fresnel) ;
+                float depthThreshold = _DepthThreshold*( 1 + fresnel) * cameraDepthTexture ;
 
 
                 float halfScaleFloor = floor(_OutlineSize * 0.5);
@@ -120,10 +119,10 @@ Shader "MyCustom_URP_Shader/URP_OutlinePP"
 
                 
                 //get neighbor depth value
-                float depth0 = tex2D(_CameraDepthTexture,bottomLeftScreenUV).r;
-                float depth1 = tex2D(_CameraDepthTexture,topRightScreenUV).r;
-                float depth2 = tex2D(_CameraDepthTexture,bottomRightScreenUV).r;
-                float depth3 = tex2D(_CameraDepthTexture,topLeftScreenUV).r;
+                float depth0 = tex2D(_CustomDepthTexture,bottomLeftScreenUV).r;
+                float depth1 = tex2D(_CustomDepthTexture,topRightScreenUV).r;
+                float depth2 = tex2D(_CustomDepthTexture,bottomRightScreenUV).r;
+                float depth3 = tex2D(_CustomDepthTexture,topLeftScreenUV).r;
 
                 //compare depth different between 2 oposite pixel
                 float depthFiniteDifference0 = depth1 - depth0;

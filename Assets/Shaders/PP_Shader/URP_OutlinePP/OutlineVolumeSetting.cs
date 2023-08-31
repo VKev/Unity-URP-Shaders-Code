@@ -11,9 +11,8 @@ public class OutlineVolumeSetting : VolumeComponent, IPostProcessComponent
 {
     public ClampedFloatParameter outlineSize = new ClampedFloatParameter(2f,1f,5f);
     public ColorParameter outlineColor = new ColorParameter(Color.white);
-    public ClampedFloatParameter depthThreshold = new ClampedFloatParameter(0.5f,0.001f,10f);
+    public ClampedFloatParameter depthThreshold = new ClampedFloatParameter(10f,0.001f,20f);
     public ClampedFloatParameter normalThreshold = new ClampedFloatParameter(0.7f, 0.001f, 5f);
-    public ClampedFloatParameter fresnelStrength = new ClampedFloatParameter(3.5f, 0.001f, 5f);
 
 
     public bool IsActive() 
