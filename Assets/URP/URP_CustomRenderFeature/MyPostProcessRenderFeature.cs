@@ -1,4 +1,5 @@
 
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
@@ -10,33 +11,37 @@ using UnityEngine.XR;
 public class MyPostProcessRenderFeature : ScriptableRendererFeature
 {
 
-    class DrawOpaquesPass : ScriptableRenderPass
+    class DrawOpaquesDepthPass : ScriptableRenderPass
     {
-        RTHandle source;
-        readonly int drawOpaqueID;
-        
-        /*RTHandle customOpaqueTextureRT;
-        readonly int customOpaqueTextureID;*/
+        RTHandle depth;
+        readonly int drawDepthID;
 
         RTHandle customDepthTextureRT;
         readonly int customDepthTextureID;
 
+
         RendererListParams rendererListParams;
         RendererList rendererList;
-        DrawingSettings drawingSettings;
-        FilteringSettings filteringSettings;
+        DrawingSettings depthDrawingSettings;
+        FilteringSettings depthFilteringSettings;
+
+        
+
+
         readonly List<ShaderTagId> shaderTagIdList;
-
-
-        public DrawOpaquesPass( LayerMask layerMask)
+        public DrawOpaquesDepthPass( LayerMask outlineMask)
         {
             renderPassEvent = RenderPassEvent.AfterRenderingOpaques;
-           
-            //customOpaqueTextureID = Shader.PropertyToID("_CustomOpaqueTexture");
-            drawOpaqueID = Shader.PropertyToID("_DrawOpaque");
-            customDepthTextureID = Shader.PropertyToID("_CustomDepthTexture");
 
-            filteringSettings = new FilteringSettings(RenderQueueRange.opaque, layerMask);
+            //customOpaqueTextureID = Shader.PropertyToID("_CustomOpaqueTexture");
+            drawDepthID = Shader.PropertyToID("_DrawOutlineDepth");
+            customDepthTextureID = Shader.PropertyToID("_CustomOutlineDepthTexture");
+
+
+            depthFilteringSettings = new FilteringSettings(RenderQueueRange.opaque, outlineMask);
+
+
+
             shaderTagIdList = new List<ShaderTagId> {
                 new ShaderTagId("UniversalForward"),
                 new ShaderTagId("UniversalForwardOnly"),
@@ -44,35 +49,25 @@ public class MyPostProcessRenderFeature : ScriptableRendererFeature
                 new ShaderTagId("SRPDefaultUnlit")
             };
 
+            
 
         }
 
         public override void Configure(CommandBuffer cmd, RenderTextureDescriptor cameraTextureDescriptor)
         {
+            //render depth to depth RThandle
+            cmd.GetTemporaryRT(drawDepthID, Screen.width,Screen.height, 32, FilterMode.Point, RenderTextureFormat.Depth);
+            depth = RTHandles.Alloc(new RenderTargetIdentifier(drawDepthID));
 
-            cmd.GetTemporaryRT(drawOpaqueID, Screen.width,Screen.height, 32, FilterMode.Point, RenderTextureFormat.Depth);
-            source = RTHandles.Alloc(new RenderTargetIdentifier(drawOpaqueID));
-
-            //USE FOR COLOR COPY
-            /*cmd.GetTemporaryRT(drawOpaqueID, Screen.width, Screen.height, 32, FilterMode.Point, RenderTextureFormat.RGB111110Float);
-            source = RTHandles.Alloc(new RenderTargetIdentifier(drawOpaqueID));*/
-            /*RenderTextureDescriptor customOpaqueTextureDescriptor = cameraTextureDescriptor;
-            //customOpaqueTextureDescriptor.depthBufferBits = 32;
-            //customOpaqueTextureDescriptor.colorFormat = RenderTextureFormat.RFloat;
-            customOpaqueTextureDescriptor.colorFormat = RenderTextureFormat.RGB111110Float;
-            customOpaqueTextureDescriptor.depthStencilFormat = GraphicsFormat.None;
-            cmd.GetTemporaryRT(customOpaqueTextureID, customOpaqueTextureDescriptor);
-            customOpaqueTextureRT = RTHandles.Alloc(new RenderTargetIdentifier(customOpaqueTextureID));*/
 
             RenderTextureDescriptor customDepthTextureDescriptor = cameraTextureDescriptor;
             customDepthTextureDescriptor.depthBufferBits = 32;
-            //customDepthTextureDescriptor.colorFormat = RenderTextureFormat.RFloat;
             customDepthTextureDescriptor.colorFormat = RenderTextureFormat.RFloat;
-            //customDepthTextureDescriptor.depthStencilFormat = GraphicsFormat.None;
             cmd.GetTemporaryRT(customDepthTextureID, customDepthTextureDescriptor);
             customDepthTextureRT = RTHandles.Alloc(new RenderTargetIdentifier(customDepthTextureID));
 
-            ConfigureTarget(source);
+
+            ConfigureTarget(depth);
             ConfigureClear(ClearFlag.All, Camera.main.backgroundColor);
 
         }
@@ -80,16 +75,18 @@ public class MyPostProcessRenderFeature : ScriptableRendererFeature
         {
             CommandBuffer cmd = CommandBufferPool.Get();
 
-            using (new ProfilingScope(cmd, new ProfilingSampler("Draw _CustomDepthTexture")))
+            using (new ProfilingScope(cmd, new ProfilingSampler("Draw _CustomOutlineDepthTexture")))
             {
 
 
-                drawingSettings = CreateDrawingSettings(shaderTagIdList, ref renderingData, renderingData.cameraData.defaultOpaqueSortFlags);
-                rendererListParams = new RendererListParams(renderingData.cullResults, drawingSettings, filteringSettings);
+                depthDrawingSettings = CreateDrawingSettings(shaderTagIdList, ref renderingData, renderingData.cameraData.defaultOpaqueSortFlags);
+                rendererListParams = new RendererListParams(renderingData.cullResults, depthDrawingSettings, depthFilteringSettings);
                 rendererList = context.CreateRendererList(ref rendererListParams);
                 cmd.DrawRendererList(rendererList);
 
-                cmd.Blit(source.nameID, customDepthTextureRT.nameID);
+                cmd.Blit(depth.nameID, customDepthTextureRT.nameID);
+
+                //cmd.ClearRenderTarget(RTClearFlags.All, Color.black, 1, 0);
 
                 /*cmd.SetGlobalTexture("_CameraDepthAttachment", source.nameID);
                 Blitter.BlitTexture(cmd, source, customDepthTextureRT, new Material(Shader.Find("Hidden/Universal Render Pipeline/CopyDepth")),0);*/
@@ -102,53 +99,117 @@ public class MyPostProcessRenderFeature : ScriptableRendererFeature
         }
         public override void OnCameraCleanup(CommandBuffer cmd)
         {
-            /*cmd.ReleaseTemporaryRT(customOpaqueTextureID);
-            customOpaqueTextureRT.Release(); */
-            cmd.ReleaseTemporaryRT(drawOpaqueID);
+
+            cmd.ReleaseTemporaryRT(drawDepthID);
             cmd.ReleaseTemporaryRT(customDepthTextureID);
             customDepthTextureRT.Release();
-            source.Release();
+            depth.Release();
         }
     }
 
-    /*class MyCopyDepth : ScriptableRenderPass
+    class DrawOpaquesObstructPass : ScriptableRenderPass
     {
-        RTHandle source;
-        RTHandle customDepthTextureRT;
-        readonly int customDepthTextureID;
-        readonly int drawOpaqueID;
+        RTHandle obstruct;
+        readonly int drawObstructID;
 
-        public MyCopyDepth()
+        RTHandle depth;
+        readonly int drawDepthID;
+
+        RTHandle customObstructTextureRT;
+        readonly int customObstructTextureID;
+
+        RTHandle customDepthObstructTextureRT;
+        readonly int customDepthObstructTextureID;
+
+
+        RendererListParams rendererListParams;
+        RendererList rendererList;
+        DrawingSettings obstructDrawingSettings;
+        FilteringSettings obstructFilteringSettings;
+        Material overrideMaterial;
+
+
+
+        readonly List<ShaderTagId> shaderTagIdList;
+        public DrawOpaquesObstructPass(LayerMask obstructMask)
         {
-            renderPassEvent = RenderPassEvent.AfterRenderingOpaques + 1;
+            renderPassEvent = RenderPassEvent.AfterRenderingOpaques;
 
-            customDepthTextureID = Shader.PropertyToID("_CustomDepthTexture");
-            drawOpaqueID = Shader.PropertyToID("_DrawOpaque");
+            //customOpaqueTextureID = Shader.PropertyToID("_CustomOpaqueTexture");
+            drawObstructID = Shader.PropertyToID("_DrawColorObstruct");
+            drawDepthID = Shader.PropertyToID("_DrawDepthObstruct");
+            customObstructTextureID = Shader.PropertyToID("_CustomColorObstructTexture");
+            customDepthObstructTextureID = Shader.PropertyToID("_CustomDepthObstructTexture");
+
+
+            obstructFilteringSettings = new FilteringSettings(RenderQueueRange.opaque, obstructMask);
+
+
+
+            shaderTagIdList = new List<ShaderTagId> {
+                new ShaderTagId("UniversalForward"),
+                new ShaderTagId("UniversalForwardOnly"),
+                new ShaderTagId("LightweightForward"),
+                new ShaderTagId("SRPDefaultUnlit")
+            };
+
+            overrideMaterial = new Material(Shader.Find("MyCustom_URP_Shader/URP_Unlit"));
+
         }
 
         public override void Configure(CommandBuffer cmd, RenderTextureDescriptor cameraTextureDescriptor)
         {
+            
+            cmd.GetTemporaryRT(drawObstructID, Screen.width, Screen.height, 32, FilterMode.Point, RenderTextureFormat.RGB565);
+            obstruct = RTHandles.Alloc(new RenderTargetIdentifier(drawObstructID));
+            
+            cmd.GetTemporaryRT(drawDepthID, Screen.width, Screen.height, 32, FilterMode.Point, RenderTextureFormat.Depth);
+            depth = RTHandles.Alloc(new RenderTargetIdentifier(drawDepthID));
+
+
+
             RenderTextureDescriptor customDepthTextureDescriptor = cameraTextureDescriptor;
             customDepthTextureDescriptor.depthBufferBits = 32;
             customDepthTextureDescriptor.colorFormat = RenderTextureFormat.RFloat;
-            customDepthTextureDescriptor.depthStencilFormat = GraphicsFormat.None;
-            cmd.GetTemporaryRT(customDepthTextureID, customDepthTextureDescriptor);
-            customDepthTextureRT = RTHandles.Alloc(new RenderTargetIdentifier(customDepthTextureID));
+            cmd.GetTemporaryRT(customDepthObstructTextureID, customDepthTextureDescriptor);
+            customDepthObstructTextureRT = RTHandles.Alloc(new RenderTargetIdentifier(customDepthObstructTextureID));
 
-            source = RTHandles.Alloc(new RenderTargetIdentifier(drawOpaqueID));
+            RenderTextureDescriptor customObstructTextureDescriptor = cameraTextureDescriptor;
+            customObstructTextureDescriptor.colorFormat = RenderTextureFormat.RGB565;
+            customObstructTextureDescriptor.depthStencilFormat = GraphicsFormat.None;
+            customObstructTextureDescriptor.depthBufferBits = 0;
+            cmd.GetTemporaryRT(customObstructTextureID, customObstructTextureDescriptor);
+            customObstructTextureRT = RTHandles.Alloc(new RenderTargetIdentifier(customObstructTextureID));
 
-            ConfigureTarget(source);
-            //ConfigureClear(ClearFlag.DepthStencil, Color.black);
+
+            ConfigureTarget(obstruct, depth);
+            ConfigureClear(ClearFlag.All, Color.black);
+
         }
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
             CommandBuffer cmd = CommandBufferPool.Get();
-            using (new ProfilingScope(cmd, new ProfilingSampler("Custom copy Depth texture")))
+
+            using (new ProfilingScope(cmd, new ProfilingSampler("Draw _Custom<Color,Depth>ObstructTexture")))
             {
-                
-                cmd.Blit(source.nameID, customDepthTextureRT.nameID);
+
+
+                obstructDrawingSettings = CreateDrawingSettings(shaderTagIdList, ref renderingData, renderingData.cameraData.defaultOpaqueSortFlags);
+                obstructDrawingSettings.overrideMaterial = overrideMaterial;
+                rendererListParams = new RendererListParams(renderingData.cullResults, obstructDrawingSettings, obstructFilteringSettings);
+                rendererList = context.CreateRendererList(ref rendererListParams);
+                cmd.DrawRendererList(rendererList);
+
+                cmd.Blit(depth.nameID, customDepthObstructTextureRT.nameID);
+
+                cmd.Blit(obstruct.nameID, customObstructTextureRT.nameID);
+
+                //cmd.ClearRenderTarget(RTClearFlags.All, Color.black, 1, 0);
+
+                /*cmd.SetGlobalTexture("_CameraDepthAttachment", source.nameID);
+                Blitter.BlitTexture(cmd, source, customDepthTextureRT, new Material(Shader.Find("Hidden/Universal Render Pipeline/CopyDepth")),0);*/
             }
-            //cmd.ClearRenderTarget(RTClearFlags.All, Color.blue);
+            //cmd.ClearRenderTarget(RTClearFlags.All, Color.black,1,0);
             context.ExecuteCommandBuffer(cmd);
 
             cmd.Clear();
@@ -156,12 +217,21 @@ public class MyPostProcessRenderFeature : ScriptableRendererFeature
         }
         public override void OnCameraCleanup(CommandBuffer cmd)
         {
-            cmd.ReleaseTemporaryRT(drawOpaqueID);
-            cmd.ReleaseTemporaryRT(customDepthTextureID);
-            source.Release();
-            customDepthTextureRT.Release();
+
+            cmd.ReleaseTemporaryRT(drawObstructID);
+            obstruct.Release();
+
+            cmd.ReleaseTemporaryRT(drawDepthID);
+            depth.Release();
+
+            cmd.ReleaseTemporaryRT(customObstructTextureID);
+            customObstructTextureRT.Release();
+
+            cmd.ReleaseTemporaryRT(customDepthObstructTextureID);
+            customDepthObstructTextureRT.Release();
+
         }
-    }*/
+    }
 
     class OutlineRenderPass : ScriptableRenderPass
     {
@@ -170,12 +240,12 @@ public class MyPostProcessRenderFeature : ScriptableRendererFeature
         RTHandle tempRT;
         readonly int tempID;
 
-        readonly Material outlineMat;
+        Material outlineMat;
         OutlineVolumeSetting outlineVolumeSetting;
 
-        public OutlineRenderPass(RenderPassEvent passEvent)
+        public OutlineRenderPass(RenderPassEvent passEvent, Material outlineMaterial)
         {
-            outlineMat = new Material(Shader.Find("MyCustom_URP_Shader/URP_OutlinePP"));
+            outlineMat = outlineMaterial;
             this.renderPassEvent = passEvent;
             tempID = Shader.PropertyToID("_Temp");
         }
@@ -207,8 +277,11 @@ public class MyPostProcessRenderFeature : ScriptableRendererFeature
                     outlineMat.SetFloat("_DepthThreshold", (float)outlineVolumeSetting.depthThreshold);
                     outlineMat.SetFloat("_NormalThreshold", (float)outlineVolumeSetting.normalThreshold);
                     outlineMat.SetColor("_OutlineColor", (Color)outlineVolumeSetting.outlineColor);
-                    
-                    
+                    if ((bool)outlineVolumeSetting.seeThroughWall)
+                        outlineMat.SetFloat("_SeeThroughWall", 1f);
+                    else
+                        outlineMat.SetFloat("_SeeThroughWall", 0f);
+
 
                     cmd.Blit(tempRT.nameID, source.nameID, outlineMat);
                     //Blitter.BlitCameraTexture(cmd, source, source, outlineMat, 0);
@@ -233,15 +306,20 @@ public class MyPostProcessRenderFeature : ScriptableRendererFeature
     }
 
     OutlineRenderPass outlineRenderPass = null;
-    DrawOpaquesPass drawOpaquesPass = null;
+    DrawOpaquesDepthPass drawOpaquesDepthPass = null;
+    DrawOpaquesObstructPass drawOpaquesObstructPass = null;
     //MyCopyDepth copyDepthPass = null;
     [SerializeField] private RenderPassEvent renderPassEvent;
-    [SerializeField] private LayerMask layerMask;
+    [SerializeField] private LayerMask outlineLayerMask;
+    [SerializeField] private LayerMask obstructLayerMask;
+    [HideInInspector] public static Material outlineMat;
     /// <inheritdoc/>
     public override void Create()
     {
-        drawOpaquesPass = new DrawOpaquesPass(layerMask);
-        outlineRenderPass = new OutlineRenderPass(renderPassEvent);
+        outlineMat = new Material(Shader.Find("MyCustom_URP_Shader/URP_OutlinePP"));
+        drawOpaquesDepthPass = new DrawOpaquesDepthPass(outlineLayerMask);
+        drawOpaquesObstructPass = new DrawOpaquesObstructPass(obstructLayerMask);
+        outlineRenderPass = new OutlineRenderPass(renderPassEvent, outlineMat);
 
     }
     public override void SetupRenderPasses(ScriptableRenderer renderer, in RenderingData renderingData)
@@ -258,13 +336,11 @@ public class MyPostProcessRenderFeature : ScriptableRendererFeature
     {
         if (renderingData.cameraData.cameraType == CameraType.Game)
         {
-            renderer.EnqueuePass(drawOpaquesPass);
+            renderer.EnqueuePass(drawOpaquesDepthPass);
+            if(outlineMat.GetFloat("_SeeThroughWall") == 0)
+                renderer.EnqueuePass(drawOpaquesObstructPass);
             renderer.EnqueuePass(outlineRenderPass);
         }
-    }
-    protected override void Dispose(bool disposing)
-    {
-        
     }
 }
 

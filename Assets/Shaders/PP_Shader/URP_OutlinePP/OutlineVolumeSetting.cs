@@ -13,6 +13,7 @@ public class OutlineVolumeSetting : VolumeComponent, IPostProcessComponent
     public ColorParameter outlineColor = new ColorParameter(Color.white);
     public ClampedFloatParameter depthThreshold = new ClampedFloatParameter(10f,0.001f,20f);
     public ClampedFloatParameter normalThreshold = new ClampedFloatParameter(0.7f, 0.001f, 5f);
+    public BoolParameter seeThroughWall =  new BoolParameter(false);
 
 
     public bool IsActive() 

@@ -15,16 +15,19 @@ MonoBehaviour:
   active: 1
   outlineSize:
     m_OverrideState: 1
-    m_Value: 2
+    m_Value: 2.26
   outlineColor:
     m_OverrideState: 1
-    m_Value: {r: 0.8301887, g: 0.7315059, b: 0.7315059, a: 1}
+    m_Value: {r: 1, g: 1, b: 1, a: 1}
   depthThreshold:
     m_OverrideState: 1
     m_Value: 13
   normalThreshold:
     m_OverrideState: 1
     m_Value: 0.7
+  seeThroughWall:
+    m_OverrideState: 1
+    m_Value: 0
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0

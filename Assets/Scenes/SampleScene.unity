@@ -676,7 +676,7 @@ GameObject:
   - component: {fileID: 1172715633}
   - component: {fileID: 1172715632}
   - component: {fileID: 1172715631}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Plane
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -842,7 +842,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: d2056ff66fcef214e9ce145fbf40cbea, type: 3}
       propertyPath: m_Layer
-      value: 6
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1231,7 +1231,7 @@ GameObject:
   - component: {fileID: 1948541816}
   - component: {fileID: 1948541815}
   - component: {fileID: 1948541814}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}

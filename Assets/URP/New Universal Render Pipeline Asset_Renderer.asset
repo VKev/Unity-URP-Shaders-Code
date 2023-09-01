@@ -95,6 +95,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Active: 1
   renderPassEvent: 550
-  layerMask:
+  outlineLayerMask:
     serializedVersion: 2
     m_Bits: 64
+  obstructLayerMask:
+    serializedVersion: 2
+    m_Bits: 183
