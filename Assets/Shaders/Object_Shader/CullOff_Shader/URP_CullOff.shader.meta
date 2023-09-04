@@ -1,9 +1,8 @@
 fileFormatVersion: 2
-guid: 274355a310ddb4646aaf51817f526b02
+guid: 4c13588568aec9244becf43536caf3fd
 ShaderImporter:
   externalObjects: {}
-  defaultTextures:
-  - _TerrainHeightMap: {instanceID: 0}
+  defaultTextures: []
   nonModifiableTextures: []
   userData: 
   assetBundleName: 

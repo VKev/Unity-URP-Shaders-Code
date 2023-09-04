@@ -1,7 +1,10 @@
-using UnityEditor;
+
 using UnityEngine;
 using UnityEngine.Rendering;
 
+#if UNITY_EDITOR
+
+using UnityEditor;
 public class URP_BlinnPhong_Editor : ShaderGUI
 {
     public enum ObjectType
@@ -14,10 +17,10 @@ public class URP_BlinnPhong_Editor : ShaderGUI
         FrontOnly, NoCulling, DoubleSided
     }
 
-    public override void AssignNewShaderToMaterial( Material mat, Shader oldShader, Shader newShader)
+    public override void AssignNewShaderToMaterial(Material mat, Shader oldShader, Shader newShader)
     {
-        base.AssignNewShaderToMaterial (mat, oldShader, newShader);
-        if( newShader.name == "MyCustom_URP_Shader/URP_BlinnPhong" )
+        base.AssignNewShaderToMaterial(mat, oldShader, newShader);
+        if (newShader.name == "MyCustom_URP_Shader/URP_BlinnPhong")
         {
             ObjectTypeUpdate(mat);
             FaceModeUpdate(mat);
@@ -33,9 +36,9 @@ public class URP_BlinnPhong_Editor : ShaderGUI
 
         EditorGUI.BeginChangeCheck();
 
-        objectTypeProp.floatValue = (int)(ObjectType)EditorGUILayout.EnumPopup("Object type",(ObjectType)objectTypeProp.floatValue);
-        FaceRenderingProp.floatValue = (int)(FaceRenderingMode)EditorGUILayout.EnumPopup("Face Rendering Mode",(FaceRenderingMode)FaceRenderingProp.floatValue);
-        
+        objectTypeProp.floatValue = (int)(ObjectType)EditorGUILayout.EnumPopup("Object type", (ObjectType)objectTypeProp.floatValue);
+        FaceRenderingProp.floatValue = (int)(FaceRenderingMode)EditorGUILayout.EnumPopup("Face Rendering Mode", (FaceRenderingMode)FaceRenderingProp.floatValue);
+
         if (EditorGUI.EndChangeCheck())//do when user change value of objectTypeProp
         {
             ObjectTypeUpdate(mat);
@@ -113,3 +116,5 @@ public class URP_BlinnPhong_Editor : ShaderGUI
         }
     }
 }
+#endif
+

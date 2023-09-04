@@ -131,7 +131,7 @@ public class MyPostProcessRenderFeature : ScriptableRendererFeature
 
 
         readonly List<ShaderTagId> shaderTagIdList;
-        public DrawOpaquesObstructPass(LayerMask obstructMask)
+        public DrawOpaquesObstructPass(LayerMask obstructMask, Material cullOffMat)
         {
             renderPassEvent = RenderPassEvent.AfterRenderingOpaques;
 
@@ -150,10 +150,9 @@ public class MyPostProcessRenderFeature : ScriptableRendererFeature
                 new ShaderTagId("UniversalForward"),
                 new ShaderTagId("UniversalForwardOnly"),
                 new ShaderTagId("LightweightForward"),
-                new ShaderTagId("SRPDefaultUnlit")
+                new ShaderTagId("SRPDefaultUnlit"),
             };
-
-            overrideMaterial = new Material(Shader.Find("MyCustom_URP_Shader/URP_Unlit"));
+            overrideMaterial = cullOffMat;
 
         }
 
@@ -312,13 +311,19 @@ public class MyPostProcessRenderFeature : ScriptableRendererFeature
     [SerializeField] private RenderPassEvent renderPassEvent;
     [SerializeField] private LayerMask outlineLayerMask;
     [SerializeField] private LayerMask obstructLayerMask;
-    [HideInInspector] public static Material outlineMat;
+    [SerializeField] public Material outlineMat;
+    [SerializeField] public Material cullOffMat;
     /// <inheritdoc/>
     public override void Create()
     {
-        outlineMat = new Material(Shader.Find("MyCustom_URP_Shader/URP_OutlinePP"));
+        if (outlineMat==null)
+            outlineMat = new Material(Shader.Find("MyCustom_URP_Shader/URP_OutlinePP"));
+
+        if(cullOffMat==null)
+            cullOffMat = new Material(Shader.Find("MyCustom_URP_Shader/URP_CullOff"));
+         
         drawOpaquesDepthPass = new DrawOpaquesDepthPass(outlineLayerMask);
-        drawOpaquesObstructPass = new DrawOpaquesObstructPass(obstructLayerMask);
+        drawOpaquesObstructPass = new DrawOpaquesObstructPass(obstructLayerMask,cullOffMat);
         outlineRenderPass = new OutlineRenderPass(renderPassEvent, outlineMat);
 
     }
@@ -337,7 +342,7 @@ public class MyPostProcessRenderFeature : ScriptableRendererFeature
         if (renderingData.cameraData.cameraType == CameraType.Game)
         {
             renderer.EnqueuePass(drawOpaquesDepthPass);
-            if(outlineMat.GetFloat("_SeeThroughWall") == 0)
+            if(outlineMat != null && outlineMat.GetFloat("_SeeThroughWall") == 0)
                 renderer.EnqueuePass(drawOpaquesObstructPass);
             renderer.EnqueuePass(outlineRenderPass);
         }

@@ -1,5 +1,27 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-6149754826288220600
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bf8cf9bbb2511642bdfec9064109969, type: 3}
+  m_Name: OutlinePostProcess
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  renderPassEvent: 550
+  outlineLayerMask:
+    serializedVersion: 2
+    m_Bits: 64
+  obstructLayerMask:
+    serializedVersion: 2
+    m_Bits: 183
+  outlineMat: {fileID: 2100000, guid: 2f45529918094b54cbf4c2b709c8de9e, type: 2}
+  cullOffMat: {fileID: 2100000, guid: 75937a1d83211104c9bacf0de107c12c, type: 2}
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10,7 +32,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: de640fe3d0db1804a85f9fc8f5cadab6, type: 3}
-  m_Name: New Universal Render Pipeline Asset_Renderer
+  m_Name: New Custom Universal Renderer Data
   m_EditorClassIdentifier: 
   debugShaders:
     debugReplacementPS: {fileID: 4800000, guid: cf852408f2e174538bcd9b7fda1c5ae7, type: 3}
@@ -24,8 +46,8 @@ MonoBehaviour:
     probeSamplingDebugMesh: {fileID: -3555484719484374845, guid: 57d7c4c16e2765b47a4d2069b311bffe, type: 3}
     probeSamplingDebugTexture: {fileID: 2800000, guid: 24ec0e140fb444a44ab96ee80844e18e, type: 3}
   m_RendererFeatures:
-  - {fileID: 9203833478308372706}
-  m_RendererFeatureMap: e2206bd6c895ba7f
+  - {fileID: -6149754826288220600}
+  m_RendererFeatureMap: 48b6587b91aea7aa
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
@@ -54,50 +76,13 @@ MonoBehaviour:
   m_DefaultStencilState:
     overrideStencilState: 0
     stencilReference: 0
-    stencilCompareFunction: 0
+    stencilCompareFunction: 8
     passOperation: 2
-    failOperation: 4
-    zFailOperation: 4
+    failOperation: 0
+    zFailOperation: 0
   m_ShadowTransparentReceive: 1
   m_RenderingMode: 0
   m_DepthPrimingMode: 0
   m_CopyDepthMode: 1
   m_AccurateGbufferNormals: 0
   m_IntermediateTextureMode: 1
---- !u!114 &3560109108236106854
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 51b019413ef7f6f47a0159ba9f19a704, type: 3}
-  m_Name: test
-  m_EditorClassIdentifier: 
-  m_Active: 1
-  material: {fileID: 2100000, guid: bdad16bb4f0f6954d87e41818aa5298c, type: 2}
-  DrawOpaque_renderPassEvent: 300
-  layerMask:
-    m_Bits: 4294967295
---- !u!114 &9203833478308372706
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4bf8cf9bbb2511642bdfec9064109969, type: 3}
-  m_Name: OutlineRenderFeature
-  m_EditorClassIdentifier: 
-  m_Active: 1
-  renderPassEvent: 550
-  outlineLayerMask:
-    serializedVersion: 2
-    m_Bits: 64
-  obstructLayerMask:
-    serializedVersion: 2
-    m_Bits: 183

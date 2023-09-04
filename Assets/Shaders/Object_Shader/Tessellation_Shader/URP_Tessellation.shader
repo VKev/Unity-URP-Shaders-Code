@@ -19,8 +19,6 @@ Shader "Unlit/URP_Tessellation"
             //#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareNormalsTexture.hlsl"
            
-            #pragma prefer_hlslcc gles
-            #pragma exclude_renderer d3d11_9x
             #pragma target 2.0
             #pragma require geometry
 
