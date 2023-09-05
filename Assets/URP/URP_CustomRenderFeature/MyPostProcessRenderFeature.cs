@@ -329,7 +329,7 @@ public class MyPostProcessRenderFeature : ScriptableRendererFeature
     }
     public override void SetupRenderPasses(ScriptableRenderer renderer, in RenderingData renderingData)
     {
-        if (renderingData.cameraData.cameraType == CameraType.Game)
+        if (renderingData.cameraData.camera == Camera.main)
         {
             outlineRenderPass.SetTarget(renderer.cameraColorTargetHandle);
         }
@@ -339,7 +339,7 @@ public class MyPostProcessRenderFeature : ScriptableRendererFeature
     // This method is called when setting up the renderer once per-camera.
     public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
     {
-        if (renderingData.cameraData.cameraType == CameraType.Game)
+        if (renderingData.cameraData.camera == Camera.main)
         {
             renderer.EnqueuePass(drawOpaquesDepthPass);
             if(outlineMat != null && outlineMat.GetFloat("_SeeThroughWall") == 0)

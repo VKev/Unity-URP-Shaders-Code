@@ -17,8 +17,8 @@ Shader "MyCustom_URP_Shader/URP_StylizeGrass"
 
         _TerrainMap("Terrain map", 2D)= "white"{}
         _Terrain("Terrain Size and Offset", vector) = (0,0,0,0)
-        _BlendIntensity("Blend intensity", float) = 0.2
-        _TopIntensity("Top intensity",float) = 1
+        _BlendIntensity("Blend intensity", Range(0,1)) = 0.2
+        _TopIntensity("Top intensity",float) = 1.2
 
     }
     SubShader
