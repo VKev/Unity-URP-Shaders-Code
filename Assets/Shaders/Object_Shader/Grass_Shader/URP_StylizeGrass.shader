@@ -19,6 +19,8 @@ Shader "MyCustom_URP_Shader/URP_StylizeGrass"
         _Terrain("Terrain Size and Offset", vector) = (0,0,0,0)
         _BlendIntensity("Blend intensity", Range(0,1)) = 0.2
         _TopIntensity("Top intensity",float) = 1.2
+        _InteractGrassDistance("Interact with grass distance", float) = 1
+        _InteractGrassStrength("Interact grass strength",float) = 5
 
     }
     SubShader

@@ -19,7 +19,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
-  m_LockedProperties: 
+  m_LockedProperties: _InteractGrassStrength
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -49,6 +49,9 @@ Material:
     - _BlendIntensity: 0.2
     - _DarkThreshold: 0.5
     - _Gloss: 1
+    - _InteractGrassDistance: 1
+    - _InteractGrassHeight: 0
+    - _InteractGrassStrength: 0.4
     - _Luminosity: 1
     - _MaxAdditionalLightIntensity: 1
     - _MaxMainLightIntensity: 1

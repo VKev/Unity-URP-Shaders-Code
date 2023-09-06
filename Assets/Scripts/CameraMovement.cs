@@ -5,26 +5,33 @@ using System.Linq;
 using System.Xml.Serialization;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using static UnityEngine.GraphicsBuffer;
 
 public class CameraMovement : MonoBehaviour
 {
     public float rotateSpeed;
-    public float moveSpeed;
+    public float zoomSpeed;
+    public float maxZoomIn;
+    public float maxZoomOut;
+
     private InputSystem inputSystem;
-    private InputAction moveAction;
+
     private InputAction lookAction;
-    private InputAction flyAction;
+    private InputAction zoomAction;
 
-    private Rigidbody rb;
 
+    public GameObject cameraPos;
+
+
+    public float zoomAmount = 0;
     private Vector2 rotateAngle;
+    private Vector2 rotateAngular;
 
     private bool isCursorLock = true;
 
     private void Awake()
     {
         inputSystem = new InputSystem();
-        rb = GetComponent<Rigidbody>();
     }
 
     private void Start()
@@ -35,15 +42,13 @@ public class CameraMovement : MonoBehaviour
 
     private void OnEnable()
     {
-        moveAction = inputSystem.Player.Move;
-        moveAction.Enable();
+
 
         lookAction = inputSystem.Player.Look;
         lookAction.Enable();
 
-        flyAction = inputSystem.Player.Fly;
-        flyAction.Enable();
-
+        zoomAction = inputSystem.Player.Zoom;
+        zoomAction.Enable();
 
 
         inputSystem.Screen.CursorLock.performed += lockCursor;
@@ -52,9 +57,8 @@ public class CameraMovement : MonoBehaviour
 
     private void OnDisable()
     {
-        moveAction.Disable();
         lookAction.Disable();
-        flyAction.Disable();
+        zoomAction.Disable();
 
         inputSystem.Screen.CursorLock.Disable();
     }
@@ -81,21 +85,19 @@ public class CameraMovement : MonoBehaviour
         if (isCursorLock)
         {
             Vector2 mouseDelta = lookAction.ReadValue<Vector2>();
-            rotateAngle.x += mouseDelta.x * Time.deltaTime * rotateSpeed;
-            rotateAngle.y += mouseDelta.y * Time.deltaTime * rotateSpeed;
+            rotateAngle.x = mouseDelta.x * Time.deltaTime * rotateSpeed;//rotateAngle.x += mouseDelta.x * Time.deltaTime * rotateSpeed;
+            rotateAngle.y = mouseDelta.y * Time.deltaTime * rotateSpeed;
 
-            transform.localRotation = Quaternion.Euler(-rotateAngle.y, rotateAngle.x, 0);
+
+            cameraPos.transform.RotateAround(cameraPos.transform.parent.position, Vector3.up, rotateAngle.x);
+            cameraPos.transform.RotateAround(cameraPos.transform.parent.position, Vector3.right, -rotateAngle.y);
+
+            transform.position = cameraPos.transform.position;
+
+
+            transform.LookAt(cameraPos.transform.parent);
         }
-        Vector2 movDir = moveAction.ReadValue<Vector2>();
-        float flyDir = flyAction.ReadValue<float>();
-        rb.velocity = (transform.forward * movDir.y + transform.right * movDir.x + Vector3.up * flyDir) * moveSpeed * Time.fixedDeltaTime;
-
-    }
-    private void FixedUpdate()
-    {
-        Vector2 movDir = moveAction.ReadValue<Vector2>();
-        float flyDir = flyAction.ReadValue<float>();
-        rb.velocity = (transform.forward * movDir.y + transform.right * movDir.x + Vector3.up * flyDir) * moveSpeed * Time.fixedDeltaTime;
+        
 
     }
 }
