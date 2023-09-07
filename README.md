@@ -5,9 +5,8 @@ Unity 2023.2.0b1
 
 
 ### Toon Shader:
-    -Color setting.
+    -Color, texture setting.
     -Lighting setting.
-    -Texture setting.
     -Main light and additional light support.
 <img src="/ShowCase/Toon.png" alt="drawing" width="400"/>
 
@@ -27,5 +26,7 @@ Unity 2023.2.0b1
     -Interactive grass.
     -Wind direction, randomize wind or sync wind.
     -Lighting setting.
+    -Can change grass model to flower model, will work fine
+    -Color, texture setting
 <img src="/ShowCase/Grass1.png" alt="drawing" width="350"/> <img src="/ShowCase/Grass2.png" alt="drawing" width="350"/>
 
