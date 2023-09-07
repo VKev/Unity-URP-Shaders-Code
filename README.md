@@ -27,5 +27,5 @@ Unity 2023.2.0b1
     -Interactive grass.
     -Wind direction, randomize wind or sync wind.
     -Lighting setting.
-<img src="/ShowCase/Grass1.png" alt="drawing" width="350"/>
-<img src="/ShowCase/Grass2.png" alt="drawing" width="350"/>
+<img src="/ShowCase/Grass1.png" alt="drawing" width="350"/> <img src="/ShowCase/Grass2.png" alt="drawing" width="350"/>
+
