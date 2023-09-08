@@ -4,10 +4,16 @@ Shader "MyCustom_URP_Shader/URP_StylizeGrass"
     {
         //_Dither ("Dither texture", 2D) = "white" {}
         _TopColor("Top Color", COLOR) = (0.2,0.8,0.2,1)
-        _WaveStrength("Wind Strength", float) = 0.4
-        _WaveSpeed("Wave Speed", Range(0.1, 0.5)) = 0.2
-        _Randomize("Random intensity", Range(1,20)) = 20
-        _WaveDir("Wind direction", vector) = (0.7,0.7,0,0)
+        _WaveLocalStrength("Wind Local Strength", float) = 0.4
+        _WaveLocalSpeed("Wave Local Speed", Range(0.1, 0.5)) = 0.2
+        _Randomize("Random Local intensity", Range(1,20)) = 20
+        _WaveLocalDir("Wind local direction", vector) = (0.7,0.7,0,0)
+
+
+        _WaveWorldStrength("Wind World Strength", float) = 0.4
+        _WaveWorldSpeed("Wave World Speed", Range(0.1, 0.5)) = 0.2
+        _WaveWorldDir("Wind World direction", vector) = (0.7,0.7,0,0)
+
         _Gloss("Gloss", Range(0,1)) = 1
         _AmbientColor("Ambient Color", COLOR) = (0,0,0,0)
         _DarkThreshold("Dark Threshold",Range(0,1)) = 0.5

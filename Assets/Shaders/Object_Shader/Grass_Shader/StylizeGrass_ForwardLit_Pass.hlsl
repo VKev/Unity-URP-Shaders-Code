@@ -32,8 +32,10 @@
                 float4 _Terrain;
                 half4 _BaseColor,_TopColor;
                 half4 _AmbientColor;
-                float2 _WaveDir;
-                float _WaveSpeed,_WaveStrength,_Randomize;
+                float2 _WaveLocalDir;
+                float2 _WaveWorldDir;
+                float _WaveLocalSpeed,_WaveLocalStrength,_Randomize;
+                float _WaveWorldSpeed,_WaveWorldStrength;
                 float _Gloss;
                 float _Luminosity,_DarkThreshold;
                 float _MinAdditionalLightIntensity,_MinMainLightIntensity;
@@ -59,21 +61,19 @@
                 o.positionWS = GetVertexPositionInputs(v.positionOS.xyz).positionWS;
 
                 
-                    float3 dir = normalize( _PlayerWpos.xyz - o.positionWS.xyz);
+                float3 dir = normalize( _PlayerWpos.xyz - o.positionWS.xyz);
 
-                    float distanceToInteractGrass = distance(_PlayerWpos.xyz, o.positionWS);
-                    distanceToInteractGrass = 1 - clamp(distanceToInteractGrass,0,_InteractGrassDistance)/_InteractGrassDistance;
-                    
-                    
-                    
+                float distanceToInteractGrass = distance(_PlayerWpos.xyz, o.positionWS);
+                distanceToInteractGrass = 1 - clamp(distanceToInteractGrass,0,_InteractGrassDistance)/_InteractGrassDistance;
 
 
-                    float3 wPos = GetVertexPositionInputs(v.positionOS.xyz).positionWS;
-                    float random = ( abs(wPos.x+wPos.z)*_Randomize ) ;
-                    v.positionOS.xz += sin( ( _Time.y + cos( random ) )*_WaveSpeed*2*PI )*o.uv.y*_WaveStrength*_WaveDir.xy;
+                float3 wPos = GetVertexPositionInputs(v.positionOS.xyz).positionWS;
+                float random = ( abs(wPos.x+wPos.z)*_Randomize ) ;
+                v.positionOS.xz += sin( ( _Time.y + cos( random ) )*_WaveLocalSpeed*2*PI )*o.uv.y*_WaveLocalStrength*_WaveLocalDir.xy;
 
                 float3 positionWS = GetVertexPositionInputs(v.positionOS.xyz).positionWS;
                 positionWS.xz -=  dir.xz*distanceToInteractGrass*o.uv.y*_InteractGrassStrength;
+                positionWS.xz += sin( ( _Time.y + abs(wPos.x)*_WaveWorldDir.x+abs(wPos.z)*_WaveWorldDir.y  )*_WaveWorldSpeed*2*PI )*o.uv.y*_WaveWorldStrength*_WaveWorldDir.xy;
 
                 o.positionCS = TransformWorldToHClip(positionWS);
                 VertexNormalInputs normalInput = GetVertexNormalInputs(v.normalOS);
