@@ -6,7 +6,7 @@ Shader "MyCustom_URP_Shader/URP_OutlinePP"
         _OutlineColor("Outline Color", COLOR) = (0.5625,0.5625,0.5625,1)
         _NormalThreshold("Normal Threshold", Range(0,1))= 0.3
         _DepthThreshold("Depth Threshold",float)= 0.05
-        _SeeThroughWall("Can see throught wall", Range(0,1)) = 0
+        [HideInInspector] _SeeThroughWall("Can see throught wall", Range(0,1)) = 0
 
     }
     SubShader

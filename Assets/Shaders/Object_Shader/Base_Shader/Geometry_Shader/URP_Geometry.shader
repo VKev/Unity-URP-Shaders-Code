@@ -1,4 +1,4 @@
-Shader "Unlit/URP_Tessellation"
+Shader "Unlit/URP_Geometry"
 {
     Properties
     {

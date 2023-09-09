@@ -2,15 +2,21 @@ Shader "MyCustom_URP_Shader/URP_Toon"
 {
     Properties
     {
+        [Header(Color options)]
         _MainTex ("Texture", 2D) = "white" {}
         _BaseColor("Base Color", COLOR) = (1, 1, 1, 1)
+
+        [Header(Lighting options)]
         _AmbientColor("Ambient Color", COLOR) = (0,0,0,0)
         _Gloss("Glossity", float) = 1
-        _RimSize("Rim Size", Range(0,1))=0.2
         _LightMaxIntensity("Light Max receiver Intensity", float) = 0
         _MainLightShadowIntensity("Main light shadow receiver intensity",float) = 1
-        [HideInInspector]_RimBlur("Rim Blur", Range(0,0.1))= 0.01
-        [HideInInspector]_RimThreshold("Rim Threshold", Range(0.01,10))= 2
+
+        [Header(Rim options)]
+        _RimSize("Rim Size", Range(0,1))=0.2
+        _RimBlur("Rim Blur", Range(0,0.1))= 0.01
+        _RimThreshold("Rim Threshold", Range(0.01,10))= 2
+
     }
     SubShader
     {

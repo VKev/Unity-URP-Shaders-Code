@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
 {
+    
     public float moveSpeed;
     public bool interactWithGrass;
     private Camera cam;

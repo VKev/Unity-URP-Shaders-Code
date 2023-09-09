@@ -24,13 +24,13 @@
                 //UNITY_DEFINE_INSTANCED_PROP(float4, _Color)
             //UNITY_INSTANCING_BUFFER_END(props)
             
-            
+            //float3 _WorldSpaceCameraPos;
             //declare Properties in CBUFFER
             CBUFFER_START(UnityPerMaterial)
                 
-                sampler2D _TerrainMap;
+                sampler2D _TerrainMap,_MainTex;
                 float4 _Terrain;
-                half4 _BaseColor,_TopColor;
+                half4 _TopColor,_BottomColor;
                 half4 _AmbientColor;
                 float2 _WaveLocalDir;
                 float2 _WaveWorldDir;
@@ -43,6 +43,7 @@
                 float4 _PlayerWpos;
                 float _InteractGrassDistance;
                 float _InteractGrassStrength;
+                float _AnimationRenderDistance;
                 
 
                 //float4 _Time;
@@ -59,23 +60,31 @@
 
                 o.uv = v.uv;
                 o.positionWS = GetVertexPositionInputs(v.positionOS.xyz).positionWS;
-
+                float distanceToCamera = length(_WorldSpaceCameraPos - o.positionWS);
+                if(distanceToCamera < _AnimationRenderDistance){
                 
-                float3 dir = normalize( _PlayerWpos.xyz - o.positionWS.xyz);
+                    float3 dir = normalize( _PlayerWpos.xyz - o.positionWS.xyz);
 
-                float distanceToInteractGrass = distance(_PlayerWpos.xyz, o.positionWS);
-                distanceToInteractGrass = 1 - clamp(distanceToInteractGrass,0,_InteractGrassDistance)/_InteractGrassDistance;
+                    float distanceToInteractGrass = distance(_PlayerWpos.xyz, o.positionWS);
+                    //if(distanceToInteractGrass <)
+                    distanceToInteractGrass = 1 - clamp(distanceToInteractGrass,0,_InteractGrassDistance)/_InteractGrassDistance;
 
 
-                float3 wPos = GetVertexPositionInputs(v.positionOS.xyz).positionWS;
-                float random = ( abs(wPos.x+wPos.z)*_Randomize ) ;
-                v.positionOS.xz += sin( ( _Time.y + cos( random ) )*_WaveLocalSpeed*2*PI )*o.uv.y*_WaveLocalStrength*_WaveLocalDir.xy;
+                    float3 wPos = GetVertexPositionInputs(v.positionOS.xyz).positionWS;
+                    float random = ( abs(wPos.x+wPos.z)*_Randomize ) ;
+                    v.positionOS.xz += sin( ( _Time.y + cos( random ) )*_WaveLocalSpeed*2*PI )*o.uv.y*_WaveLocalStrength*_WaveLocalDir.xy;
 
-                float3 positionWS = GetVertexPositionInputs(v.positionOS.xyz).positionWS;
-                positionWS.xz -=  dir.xz*distanceToInteractGrass*o.uv.y*_InteractGrassStrength;
-                positionWS.xz += sin( ( _Time.y + abs(wPos.x)*_WaveWorldDir.x+abs(wPos.z)*_WaveWorldDir.y  )*_WaveWorldSpeed*2*PI )*o.uv.y*_WaveWorldStrength*_WaveWorldDir.xy;
+                    float3 positionWS = GetVertexPositionInputs(v.positionOS.xyz).positionWS;
+                    positionWS.xz -=  dir.xz*distanceToInteractGrass*o.uv.y*_InteractGrassStrength;
+                    if (length(_WaveWorldDir.xy)>0 )
+                        positionWS.xz += sin( ( _Time.y + abs(wPos.x)*_WaveWorldDir.x+abs(wPos.z)*_WaveWorldDir.y  )*_WaveWorldSpeed*2*PI )*o.uv.y*_WaveWorldStrength*normalize( _WaveWorldDir.xy);
 
-                o.positionCS = TransformWorldToHClip(positionWS);
+                    o.positionCS = TransformWorldToHClip(positionWS);
+                    
+                }
+                else{
+                    o.positionCS = TransformObjectToHClip(v.positionOS.xyz);
+                }
                 VertexNormalInputs normalInput = GetVertexNormalInputs(v.normalOS);
                 o.normalWS = normalInput.normalWS;
                 //o.screenPos = ComputeScreenPos(o.positionCS);
@@ -94,7 +103,7 @@
                 //float4 terrainHeightTexture = tex2D(_TerrainHeightMap,i.uv);
 
                 //float2 screenUV = i.screenPos.xy / i.screenPos.w;
-
+                float distanceToCamera = length(_WorldSpaceCameraPos - i.positionWS);
                 
 
                 InputData inputdata = (InputData)0;
@@ -104,14 +113,14 @@
 
                 Light mainLight = GetMainLight(shadowcoord);
 
-
+                float4 mainTex = tex2D(_MainTex,i.uv);
 
                 float3 mainSpecularLight = SpecularLight(i.normalWS,i.positionWS,1-_Gloss,mainLight);
                 mainSpecularLight = clamp(mainSpecularLight,_DarkThreshold,1) *_Luminosity;
 
 
                 float4 terrainTex = tex2D(_TerrainMap, (i.positionWS.xz-_Terrain.zw)/_Terrain.xy);
-                float4 gradientColor = lerp(terrainTex/float4( mainSpecularLight,1),  terrainTex*_TopIntensity+_TopColor, saturate( i.uv.y-_BlendIntensity));
+                float4 gradientColor = lerp(terrainTex*mainTex/float4( mainSpecularLight,1) + _BottomColor,  terrainTex*mainTex*_TopIntensity+_TopColor, saturate( i.uv.y-_BlendIntensity));
 
                 LightingData lightingData = (LightingData)0;
                 float3 baseColor = gradientColor.rgb
@@ -125,7 +134,7 @@
 
                 lightingData.mainLightColor  += baseColor;
 
-
+                if(distanceToCamera < _AnimationRenderDistance){
                 #if defined(_ADDITIONAL_LIGHTS)
                     uint pixelLightCount = GetAdditionalLightsCount();
                     for (uint lightIndex = 0; lightIndex < pixelLightCount; lightIndex++)
@@ -149,6 +158,7 @@
                         
                     }
                 #endif
+                }
 
 
 
