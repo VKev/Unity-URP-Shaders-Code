@@ -32,7 +32,7 @@ Shader "MyCustom_URP_Shader/URP_Toon"
 
             #pragma vertex vert
             #pragma fragment frag
-
+            #pragma multi_compile_instancing
             //specular of UniversalFragmentBlinnPhong only work with this define
             #define _SPECULAR_COLOR
 

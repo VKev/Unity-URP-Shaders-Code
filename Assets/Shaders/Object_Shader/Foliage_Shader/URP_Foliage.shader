@@ -2,7 +2,31 @@ Shader "MyCustom_URP_Shader/URP_Foliage"
 {
     Properties
     {
+        [Header(Color options)]
+        _Color("Color", COLOR) = (0.1,0.55,0,1 )
+        _AmbientColor("Ambient color", COLOR) = (0.067,0.44,0,0)
+
+        [Header(Lighting options)]
+        _Gloss("Gloss", Range(0,1)) = 1
+        _MinMainLightIntensity("Min main light receive", Range(0,1)) = 0.7
+
+        [Header(Texture options)]
         _MainTex ("Texture", 2D) = "white" {}
+        _BlendEffect("Blend effect", Range(0,1)) = 1
+        _FluffyScale("Fluffy scale",float) = 2
+        _Randomize("Random scatter", float) = 1
+
+        [Header(Local animation options)]
+        _WaveLocalAmplitude("Local wave amplitude", float) = 0.2
+        _WaveLocalSpeed("Local wave speed", float) = 1
+        _WaveLocalDir("Local wind direction", vector) = (0.7,0.2,0,0)
+        
+        [Header(World animation options)]
+        _WaveWorldAmplitude("World wave amplitude", float) = 0.1
+        _WaveWorldSpeed("World wave speed", float) = 1
+        _WaveWorldDir("World wind direction", vector) = (0.4,0.4,0,0)
+
+        _Cutoff("Cutout Intensity", Range(0,1)) = 0.1
     }
     SubShader
     {
@@ -11,6 +35,8 @@ Shader "MyCustom_URP_Shader/URP_Foliage"
                 "RenderPipeline" = "UniversalPipeline" }
         LOD 100
 
+        Cull Off
+
         Pass
         {
             HLSLPROGRAM
@@ -18,55 +44,37 @@ Shader "MyCustom_URP_Shader/URP_Foliage"
             #pragma vertex vert
             #pragma fragment frag
 
+            
 
 
-
+            #pragma multi_compile_instancing
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+            #include "Assets/VkevShaderLib.hlsl"
 
-            struct appdata
-            {
-                float4 positionOS   : POSITION;//OS : OBJECT SPACE
-                float2 uv : TEXCOORD0;
-            };
+            #include "Foliage_ForwardLit_Pass.hlsl"
 
-            struct vertOut
-            {
-                float4 positionCS  : SV_POSITION;// HCS: H CLIP SPACE
-                float2 uv:TEXCOORD0;
-            };
+            ENDHLSL
+        }
+        Pass {
+            // The shadow caster pass, which draws to shadow maps
+            Name "ShadowCaster"
+            Tags{"LightMode" = "ShadowCaster"}
 
-            //declare Properties in CBUFFER
-            CBUFFER_START(UnityPerMaterial)
-                
-                sampler2D _MainTex;
-                half4 _BaseColor;
-                
-            CBUFFER_END
+            ColorMask 0 // No color output, only depth
+            Cull Off
 
-            
+            HLSLPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
+            #pragma multi_compile_instancing
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
-            vertOut vert(appdata v)
-            {
-                vertOut o;
-                o.uv = v.uv;
-                //v.positionOS.xy += (2*v.uv-1);
-                o.positionCS = TransformObjectToHClip(v.positionOS.xyz);
+            //#pragma shader_feature_local _ALPHA_CUTOUT
+            //#pragma shader_feature_local _DOUBLE_SIDED_NORMALS
+            #define _ALPHA_CUTOUT
 
-
-                return o;
-            }
-
-            
-
-            //float3 _LightDirection;
-            half4 frag(vertOut i, FRONT_FACE_TYPE frontFace : FRONT_FACE_SEMANTIC) : SV_Target//get front face of object
-            {
-                float4 mainTex = tex2D(_MainTex,i.uv);
-                
-                return float4 (i.uv,0,1);
-                //return mainTex;
-                //return UniversalFragmentBlinnPhong(inputData , surfaceData);
-            }
+            #include "Foliage_ShadowCaster_Pass.hlsl"
 
             ENDHLSL
         }

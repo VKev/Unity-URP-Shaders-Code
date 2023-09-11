@@ -58,6 +58,9 @@ Material:
     - _MaxMainLightIntensity: 1
     - _MinAdditionalLightIntensity: 1
     - _MinMainLightIntensity: 1
+    - _RandomLength: 0.25
+    - _RandomLocalLength: 0.4
+    - _RandomWorldLength: 0.25
     - _Randomize: 20
     - _ShadowIntensity: 1
     - _TerrainMaxHeight: 200
@@ -67,15 +70,15 @@ Material:
     - _WaveLocalStrength: 0.4
     - _WaveSpeed: 0.2
     - _WaveStrength: 0.4
-    - _WaveWorldSpeed: 0.25
+    - _WaveWorldSpeed: 0.3
     - _WaveWorldStrength: 0.05
     m_Colors:
-    - _AmbientColor: {r: 1, g: 1, b: 1, a: 0}
+    - _AmbientColor: {r: 0.9622642, g: 0.9622642, b: 0.9622642, a: 0}
     - _BottomColor: {r: 0, g: 0, b: 0, a: 1}
     - _Terrain: {r: 100, g: 100, b: -50, a: -50}
     - _TopColor: {r: 0.46834275, g: 0.6792453, b: 0.30373797, a: 1}
     - _WaveDir: {r: 0.7, g: 0.7, b: 0.18, a: 0}
     - _WaveLocalDir: {r: 0.7, g: 0.7, b: 0, a: 0}
-    - _WaveWorldDir: {r: 0.2, g: 0.4, b: 0, a: 0}
+    - _WaveWorldDir: {r: 1, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

@@ -5,6 +5,7 @@
                 float3 normalOS : NORMAL;
                 float4 tangentOS: TANGENT;
                 float2 uv : TEXCOORD0;
+                UNITY_VERTEX_INPUT_INSTANCE_ID//GPU instancing
             };
 
             struct vertOut
@@ -14,10 +15,13 @@
                 float4 tangentWS : TEXCOORD3;
                 float2 uv:TEXCOORD0;
                 float3 positionWS: TEXCOORD2;
+                UNITY_VERTEX_INPUT_INSTANCE_ID//GPU instancing
             };
             vertOut vert(appdata v)
             {
                 vertOut o;
+                UNITY_SETUP_INSTANCE_ID(v);//GPU instancing
+                UNITY_TRANSFER_INSTANCE_ID(v,o);//GPU instancing
                 o.uv = v.uv;
                 o.positionCS = TransformObjectToHClip(v.positionOS.xyz);
 
@@ -30,16 +34,21 @@
                 return o;
             }
 
+            UNITY_INSTANCING_BUFFER_START(props)
+                UNITY_DEFINE_INSTANCED_PROP(float, _Gloss)
+                UNITY_DEFINE_INSTANCED_PROP(float4, _AmbientColor)
+            UNITY_INSTANCING_BUFFER_END(props)
+
             CBUFFER_START(UnityPerMaterial)
                 sampler2D _MainTex;
-                float _Gloss;
                 float _RimSize,_RimThreshold,_RimBlur;
-                float4 _AmbientColor, _BaseColor;
+                float4 _BaseColor;
+                
                 float _LightMaxIntensity;
                 float _MainLightShadowIntensity;
             CBUFFER_END
 
-            float3 generateToonLightBlinnPhong(float3 N, float3 wPos, float3 V,Light light){
+            float3 generateToonLightBlinnPhong(float3 N, float3 wPos, float3 V,Light light, float4 ambientColor, float gloss){
 
                 float3 L = normalize(light.direction); 
                 float3 fresnel = 1-saturate(dot(N,V));//float3 L = normalize(GetAdditionalLight(0,N).direction); 
@@ -54,7 +63,7 @@
                 deffuseLight = smoothstep(0,0.01, deffuseLight );
                 
 
-                float3 specularLight = SpecularLight(N,wPos,_Gloss,light);
+                float3 specularLight = SpecularLight(N,wPos,gloss,light);
                 specularLight = smoothstep(0.005,0.006,specularLight);
 
                 
@@ -63,7 +72,7 @@
                 float3 Col = LightColor*( 
                 deffuseLight *light.shadowAttenuation 
                 + specularLight*light.shadowAttenuation 
-                + _AmbientColor.rgb 
+                + ambientColor.rgb 
                 + rim*light.shadowAttenuation );
 
                 return Col;
@@ -72,6 +81,11 @@
             //float3 _LightDirection;
             half4 frag(vertOut i, FRONT_FACE_TYPE frontFace : FRONT_FACE_SEMANTIC) : SV_Target//get front face of object
             {
+                UNITY_SETUP_INSTANCE_ID(i);
+
+                float gloss = UNITY_ACCESS_INSTANCED_PROP(props, _Gloss);
+                float4 ambientColor = UNITY_ACCESS_INSTANCED_PROP(props, _AmbientColor);
+
                 float4 mainTex = tex2D(_MainTex,i.uv);
                 float3 N = normalize(i.normalWS);
                 float3 wPos = i.positionWS;
@@ -88,7 +102,7 @@
 
 
 
-                float3 baseColor = _BaseColor.rgb*mainTex.xyz*generateToonLightBlinnPhong(N,wPos,V,mainLight);
+                float3 baseColor = _BaseColor.rgb*mainTex.xyz*generateToonLightBlinnPhong(N,wPos,V,mainLight,ambientColor,gloss);
                 
 
 
@@ -101,7 +115,7 @@
                     {
                         Light AddLight = GetAdditionalLight(lightIndex,wPos,shadowMask);
                         
-                        float3 additionalColor = _BaseColor.rgb*mainTex.xyz*generateToonLightBlinnPhong(N,wPos,V,AddLight);
+                        float3 additionalColor = _BaseColor.rgb*mainTex.xyz*generateToonLightBlinnPhong(N,wPos,V,AddLight,ambientColor,gloss);
                         lightingData.additionalLightsColor += additionalColor;
                         
                     }

@@ -2,7 +2,7 @@
             
             struct appdata
             {
-                float4 positionOS   : POSITION;//OS : OBJECT SPACE
+                float4 positionOS   : POSITION;
                 float2 uv : TEXCOORD0;
                 float3 normalOS : NORMAL;
                 UNITY_VERTEX_INPUT_INSTANCE_ID//GPU instancing
@@ -12,9 +12,8 @@
 
             struct vertOut
             {
-                float4 positionCS  : SV_POSITION;// HCS: H CLIP SPACE
+                float4 positionCS  : SV_POSITION;
                 float2 uv:TEXCOORD0;
-                //float4 screenPos : TEXCOORD1;
                 float3 normalWS : TEXCOORD2;
                 float3 positionWS: TEXCOORD3;
                 UNITY_VERTEX_INPUT_INSTANCE_ID//GPU instancing
@@ -24,29 +23,37 @@
                 //UNITY_DEFINE_INSTANCED_PROP(float4, _Color)
             //UNITY_INSTANCING_BUFFER_END(props)
             
-            //float3 _WorldSpaceCameraPos;
-            //declare Properties in CBUFFER
+
             CBUFFER_START(UnityPerMaterial)
                 
-                sampler2D _TerrainMap,_MainTex;
-                float4 _Terrain;
+                float _AnimationRenderDistance;
+
                 half4 _TopColor,_BottomColor;
-                half4 _AmbientColor;
+                sampler2D _MainTex;
+
+                float _WaveLocalSpeed,_WaveLocalStrength;
+                float _Randomize,_RandomLocalLength;
                 float2 _WaveLocalDir;
-                float2 _WaveWorldDir;
-                float _WaveLocalSpeed,_WaveLocalStrength,_Randomize;
+
+
                 float _WaveWorldSpeed,_WaveWorldStrength;
+                float _RandomWorldLength;
+                float2 _WaveWorldDir;
+
+
                 float _Gloss;
+                half4 _AmbientColor;
+                float _TopIntensity;
                 float _Luminosity,_DarkThreshold;
                 float _MinAdditionalLightIntensity,_MinMainLightIntensity;
-                float _TopIntensity,_BlendIntensity;
-                float4 _PlayerWpos;
-                float _InteractGrassDistance;
-                float _InteractGrassStrength;
-                float _AnimationRenderDistance;
                 
-
-                //float4 _Time;
+                sampler2D _TerrainMap;
+                float4 _Terrain;
+                float _BlendIntensity;
+                float _InteractGrassStrength;
+                
+                float _InteractGrassDistance;
+                float4 _PlayerWpos;
             CBUFFER_END
 
      
@@ -60,31 +67,36 @@
 
                 o.uv = v.uv;
                 o.positionWS = GetVertexPositionInputs(v.positionOS.xyz).positionWS;
+
+
                 float distanceToCamera = length(_WorldSpaceCameraPos - o.positionWS);
                 if(distanceToCamera < _AnimationRenderDistance){
                 
                     float3 dir = normalize( _PlayerWpos.xyz - o.positionWS.xyz);
 
                     float distanceToInteractGrass = distance(_PlayerWpos.xyz, o.positionWS);
-                    //if(distanceToInteractGrass <)
                     distanceToInteractGrass = 1 - clamp(distanceToInteractGrass,0,_InteractGrassDistance)/_InteractGrassDistance;
 
 
                     float3 wPos = GetVertexPositionInputs(v.positionOS.xyz).positionWS;
                     float random = ( abs(wPos.x+wPos.z)*_Randomize ) ;
-                    v.positionOS.xz += sin( ( _Time.y + cos( random ) )*_WaveLocalSpeed*2*PI )*o.uv.y*_WaveLocalStrength*_WaveLocalDir.xy;
+
+                    v.positionOS.xz += _WaveLocalStrength*(o.uv.y*normalize(_WaveLocalDir.xy)*sin( ( _Time.y + cos( random ) )*_WaveLocalSpeed*2*PI )  +  cos( random)*_RandomLocalLength );
 
                     float3 positionWS = GetVertexPositionInputs(v.positionOS.xyz).positionWS;
+
                     positionWS.xz -=  dir.xz*distanceToInteractGrass*o.uv.y*_InteractGrassStrength;
+
                     if (length(_WaveWorldDir.xy)>0 )
-                        positionWS.xz += sin( ( _Time.y + abs(wPos.x)*_WaveWorldDir.x+abs(wPos.z)*_WaveWorldDir.y  )*_WaveWorldSpeed*2*PI )*o.uv.y*_WaveWorldStrength*normalize( _WaveWorldDir.xy);
+                        positionWS.xz +=  _WaveWorldStrength*( sin( ( _Time.y + (wPos.x)  )*_WaveWorldSpeed*2*PI )*o.uv.y*normalize( _WaveWorldDir.xy) +  cos( random)*_RandomWorldLength );
 
                     o.positionCS = TransformWorldToHClip(positionWS);
-                    
                 }
                 else{
                     o.positionCS = TransformObjectToHClip(v.positionOS.xyz);
                 }
+
+
                 VertexNormalInputs normalInput = GetVertexNormalInputs(v.normalOS);
                 o.normalWS = normalInput.normalWS;
                 //o.screenPos = ComputeScreenPos(o.positionCS);

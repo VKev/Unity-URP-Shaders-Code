@@ -5,23 +5,23 @@ Shader "MyCustom_URP_Shader/URP_StylizeGrass"
         [Header(Rendering options)]
         _AnimationRenderDistance("Animation render distance", float) = 60
 
-        
-        //_Dither ("Dither texture", 2D) = "white" {}
         [Header(Color options)]
-        _MainTex("Grass texture", 2D) = "white"{}
-        _TopColor("Grass top color", COLOR) = (0.2,0.8,0.2,1)
-        _BottomColor("Grass bottom color", COLOR) = (0,0,0,1)
+        _MainTex("Texture", 2D) = "white"{}
+        _TopColor("Top color", COLOR) = (0.2,0.8,0.2,1)
+        _BottomColor("Bottom color", COLOR) = (0,0,0,1)
 
         [Header(Local animation options)]
         _WaveLocalStrength("Local wind strength", float) = 0.4
         _WaveLocalSpeed("Local wave speed", Range(0.1, 0.5)) = 0.2
-        _Randomize("Local random intensity", Range(1,20)) = 20
+        _Randomize("Local cycle random intensity", Range(1,20)) = 20
+        _RandomLocalLength("Random amplitude intensity",float) = 0.25
         _WaveLocalDir("Local wind direction", vector) = (0.7,0.7,0,0)
 
         [Header(World animation options)]
-        _WaveWorldSpeed("World wave speed", Range(0.1, 0.5)) = 0.2
-        _WaveWorldStrength("World wind strength", float) = 0.4
-        _WaveWorldDir("World wind direction", vector) = (0.2,0.4,0,0)
+        _WaveWorldSpeed("World wave speed", Range(0.1, 0.5)) = 0.3
+        _WaveWorldStrength("World wind strength", float) = 0.05
+        _RandomWorldLength("Random amplitude intensity",float) = 0.25
+        _WaveWorldDir("World wind direction", vector) = (1,0,0,0)
 
         [Header(Lighting options)]
         _Gloss("Specular gloss", Range(0,1)) = 1
@@ -43,12 +43,11 @@ Shader "MyCustom_URP_Shader/URP_StylizeGrass"
     SubShader
     {
         Tags {  "RenderType" = "Opaque" 
-                //"Queue" = "Transparent"
                 "RenderPipeline" = "UniversalPipeline" }
         LOD 100
+
         Cull Off
 
-        //Blend SrcAlpha OneMinusSrcAlpha
         Pass
         {
             HLSLPROGRAM
