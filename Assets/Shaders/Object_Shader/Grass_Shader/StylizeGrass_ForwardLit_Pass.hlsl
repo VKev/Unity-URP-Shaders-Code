@@ -132,15 +132,17 @@
 
 
                 float4 terrainTex = tex2D(_TerrainMap, (i.positionWS.xz-_Terrain.zw)/_Terrain.xy);
-                float4 gradientColor = lerp(terrainTex*mainTex/float4( mainSpecularLight,1) + _BottomColor,  terrainTex*mainTex*_TopIntensity+_TopColor, saturate( i.uv.y-_BlendIntensity));
+                float4 gradientColor = lerp(terrainTex*mainTex/float4( mainSpecularLight,1) + _BottomColor,  (terrainTex*mainTex*_TopIntensity+_TopColor)*float4( mainLight.color,1), saturate( i.uv.y-_BlendIntensity));
 
                 LightingData lightingData = (LightingData)0;
                 float3 baseColor = gradientColor.rgb
-                                   * mainLight.color
+                                   
                                    * mainLight.shadowAttenuation 
                                    * mainSpecularLight
-                                   * _AmbientColor.xyz
-                                   * min( mainLight.distanceAttenuation,_MinMainLightIntensity);
+                                   * min( mainLight.distanceAttenuation,_MinMainLightIntensity)
+
+                                   * _AmbientColor.xyz;
+                                   
 
 
 

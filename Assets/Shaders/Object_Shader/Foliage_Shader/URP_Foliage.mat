@@ -42,21 +42,30 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _AnimationRenderDistance: 34.46
+    - _BiTangentRandom: 1
+    - _BitangentRandom: 0
     - _BlendEffect: 1
     - _Cutoff: 0.1
     - _FluffyScale: 2
     - _Gloss: 1
-    - _MinMainLightIntensity: 0.432
+    - _InteractDistance: 1
+    - _InteractStrength: 0.64
+    - _MinMainLightIntensity: 1
+    - _NormalRandom: 1
     - _Randomize: 1
+    - _TangentRandom: 0
     - _WaveAmplitude: 0.15
     - _WaveLocalAmplitude: 0.2
+    - _WaveLocalHorizontalAmplitude: 0.2
     - _WaveLocalSpeed: 1
+    - _WaveLocalVerticalAmplitude: 0.2
     - _WaveSpeed: 1
     - _WaveWorldAmplitude: 0.1
     - _WaveWorldSpeed: 1
     m_Colors:
-    - _AmbientColor: {r: 0.067502126, g: 0.4433962, b: 0, a: 0}
-    - _Color: {r: 0.108322635, g: 0.5471698, b: 0, a: 1}
+    - _AmbientColor: {r: 0.08312913, g: 0.5566038, b: 0, a: 0}
+    - _Color: {r: 0.26745853, g: 0.42352942, b: 0, a: 1}
     - _NoiseVector1: {r: 1, g: 0, b: 0, a: 0}
     - _NoiseVector2: {r: 0, g: 0.7, b: 0, a: 0}
     - _NoiseVector3: {r: -1.36, g: -5.23, b: 0, a: 0}

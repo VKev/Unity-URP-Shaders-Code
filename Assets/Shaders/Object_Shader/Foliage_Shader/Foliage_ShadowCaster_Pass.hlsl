@@ -51,13 +51,17 @@
             UNITY_INSTANCING_BUFFER_START(props)
                 UNITY_DEFINE_INSTANCED_PROP(float, _FluffyScale)
                  UNITY_DEFINE_INSTANCED_PROP(float, _BlendEffect)
-                 UNITY_DEFINE_INSTANCED_PROP(float, _Randomize)
+                 UNITY_DEFINE_INSTANCED_PROP(float, _NormalRandom)
+                 UNITY_DEFINE_INSTANCED_PROP(float, _TangentRandom)
+                 UNITY_DEFINE_INSTANCED_PROP(float, _BitangentRandom)
+                 UNITY_DEFINE_INSTANCED_PROP(float, _WaveLocalHorizontalAmplitude)
+                 UNITY_DEFINE_INSTANCED_PROP(float, _WaveLocalVerticalAmplitude)
             UNITY_INSTANCING_BUFFER_END(props)
 
             CBUFFER_START(UnityPerMaterial)
 
                 float _Cutoff;
-                float _WaveLocalAmplitude,_WaveWorldAmplitude;
+                float _WaveWorldAmplitude;
                 float4 _WaveLocalDir,_WaveWorldDir;
                 float _WaveLocalSpeed,_WaveWorldSpeed;
                 float _WaveSpeed;
@@ -66,60 +70,58 @@
                 sampler2D _MainTex;
             CBUFFER_END
 
-
+           
             vertOut vert(appdata v)
             {
                 vertOut o;
                 UNITY_SETUP_INSTANCE_ID(v);
                 UNITY_TRANSFER_INSTANCE_ID(v,o);
-                float3 normalWS = TransformObjectToWorldNormal(v.normalOS);//conver OS normal to WS normal
-                //float3 positionWS = GetVertexPositionInputs(v.positionOS.xyz).positionWS; // convert OS position to WS position
+                float3 normalWS = TransformObjectToWorldNormal(v.normalOS);
 
                 float fluffyScale = UNITY_ACCESS_INSTANCED_PROP(props, _FluffyScale);
                 float blendEffect = UNITY_ACCESS_INSTANCED_PROP(props, _BlendEffect);
-                float randomIntensity = UNITY_ACCESS_INSTANCED_PROP(props, _Randomize);
+                float normalRandom = UNITY_ACCESS_INSTANCED_PROP(props, _NormalRandom);
+                float tangentRandom = UNITY_ACCESS_INSTANCED_PROP(props, _TangentRandom);
+                float bitangentRandom = UNITY_ACCESS_INSTANCED_PROP(props, _BitangentRandom);
+                float waveLocalHorizontalAmplitude = UNITY_ACCESS_INSTANCED_PROP(props, _WaveLocalHorizontalAmplitude);
+                float waveLocalVerticalAmplitude = UNITY_ACCESS_INSTANCED_PROP(props, _WaveLocalVerticalAmplitude);
+
+
+
 
                 #ifdef _ALPHA_CUTOUT
                     o.uv = v.uv;
                 #endif
-                
-
                 o.positionWS = GetVertexPositionInputs(v.positionOS.xyz).positionWS;
-                float3 wPos = o.positionWS;
-
-                float random =  randomIntensity*(abs(wPos.x)+abs(wPos.z))  ;
-
                 o.normalWS = GetVertexNormalInputs(v.normalOS).normalWS;//conver OS normal to WS normal
                 o.tangentWS = GetVertexNormalInputs(v.normalOS,v.tangentOS).tangentWS;
                 o.biTangent = cross(o.normalWS, o.tangentWS)
                               * (v.tangentOS.w) 
                               * (unity_WorldTransformParams.w);
 
-                float3x3 transposeTangent = transpose(float3x3(o.tangentWS, o.biTangent, o.normalWS*sin(random) ));
+                normalRandom =  Random(o.positionWS, normalRandom)  ;
+                tangentRandom =  Random(o.positionWS, tangentRandom)  ;
+                bitangentRandom =  Random(o.positionWS, bitangentRandom)  ;
+                float3x3 transposeTangent = TransposeTangent((sin(bitangentRandom)+1)*o.tangentWS,
+                                                             (sin(tangentRandom)+1)*o.biTangent, 
+                                                             (sin(normalRandom))*o.normalWS);
 
-                float3 foliageUV = (mul(float3(2*v.uv-1,0), transposeTangent ).xyz);
+                float3 quadScatter = QuadScatter(transposeTangent, o.uv, normalRandom, blendEffect, fluffyScale);
+                
+
+                v.positionOS.xyz += quadScatter;
 
 
-                foliageUV = mul(float4( foliageUV,0),unity_ObjectToWorld).xyz;
-                foliageUV = normalize(foliageUV)*fluffyScale;
-                foliageUV = lerp(0,foliageUV,blendEffect);
 
-                v.positionOS.xyz += foliageUV;
-                v.positionOS.xz += sin((_Time.y + random)*_WaveLocalSpeed)
-                                  *_WaveLocalAmplitude*o.uv.y
-                                  *normalize(_WaveLocalDir.xy);
+                v.positionOS += WindHorizontalOS( o.uv,normalRandom, _WaveLocalSpeed, waveLocalHorizontalAmplitude, _WaveLocalDir);
+                v.positionOS += WindVerticalOS( o.uv, normalRandom, _WaveLocalSpeed, waveLocalVerticalAmplitude);
 
-                v.positionOS.y += sin((_Time.y + random)*_WaveLocalSpeed)
-                                  *_WaveLocalAmplitude
-                                  *o.uv.y;
 
-                float3 positionWS = GetVertexPositionInputs(v.positionOS.xyz).positionWS;
-                positionWS.xz += sin((_Time.y + random)*_WaveWorldSpeed)
-                                 *_WaveWorldAmplitude
-                                 *normalize( _WaveWorldDir.xy)
-                                 *o.uv.y;
 
-                o.positionCS = GetShadowCasterPositionCS(positionWS,normalWS); //apply shadow bias
+                float3 finalPositionWS = GetVertexPositionInputs(v.positionOS.xyz).positionWS;
+                finalPositionWS+= WindHorizontalWS(o.uv, normalRandom, _WaveWorldSpeed, _WaveWorldAmplitude, _WaveWorldDir );
+
+                o.positionCS = GetShadowCasterPositionCS(finalPositionWS,normalWS);
 
                 return o;
             }

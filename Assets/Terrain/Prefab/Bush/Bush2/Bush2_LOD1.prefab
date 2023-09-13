@@ -11,13 +11,12 @@ GameObject:
   - component: {fileID: 5188833953325711495}
   - component: {fileID: 2972266449277426814}
   - component: {fileID: 2711183211580445135}
-  - component: {fileID: 7084057336873766214}
   m_Layer: 0
   m_Name: Bush2_LOD1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &5188833953325711495
 Transform:
@@ -86,20 +85,3 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &7084057336873766214
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9124216485098091484}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4bcc9f7861edcb14eb2437cef5109b15, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Color: {r: 0.10980392, g: 0.54901963, b: 0, a: 0}
-  AmbientColor: {r: 0.090003535, g: 0.6037736, b: 0, a: 0}
-  FluffyScale: 1.32
-  BlendScale: 1.68
-  RandomScatter: 1.21
