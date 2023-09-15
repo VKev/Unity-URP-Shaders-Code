@@ -41,3 +41,4 @@ Unity 2023.2.0b1
     -Subsurface scattering support.
    >**Optimization**: GPU instancing, Occlusion culling, Frustum culling, LOD.
 
+<img src="/ShowCase/Foliage1.png" alt="drawing" width="350"/> <img src="/ShowCase/Foliage2.png" alt="drawing" width="350"/>
