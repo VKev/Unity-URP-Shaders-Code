@@ -16,13 +16,14 @@ public class Foliage_PropertiesManager : MonoBehaviour
 
     public float LocalWindAmplitude_Vertical = 0.2f;
     public float LocalWindAmplitude_Horizontal = 0.2f;
-    private void OnValidate()
+    public new Renderer renderer;
+
+    MaterialPropertyBlock propertyBlockOnValidate;
+    private void Start()
     {
+        renderer = GetComponent<MeshRenderer>();
 
-        Renderer renderer = GetComponent<Renderer>();
-
-        if (propertyBlock == null)
-            propertyBlock = new MaterialPropertyBlock();
+        propertyBlock = new MaterialPropertyBlock();
 
         propertyBlock.SetFloat("_FluffyScale", FluffyScale);
         propertyBlock.SetFloat("_BlendEffect", BlendScale);
@@ -38,5 +39,28 @@ public class Foliage_PropertiesManager : MonoBehaviour
         //propertyBlock.SetFloat("_WaveSpeed", Random.Range(0.1f, 0.3f));
 
         renderer.SetPropertyBlock(propertyBlock);
+    }
+
+    private void OnValidate()
+    {
+
+        Renderer renderer = GetComponent<MeshRenderer>();
+        if (propertyBlockOnValidate == null)
+            propertyBlockOnValidate = new MaterialPropertyBlock();
+
+        propertyBlockOnValidate.SetFloat("_FluffyScale", FluffyScale);
+        propertyBlockOnValidate.SetFloat("_BlendEffect", BlendScale);
+        propertyBlockOnValidate.SetFloat("_NormalRandom", NormalRandom);
+        propertyBlockOnValidate.SetFloat("_TangentRandom", TangentRandom);
+        propertyBlockOnValidate.SetFloat("_BitangentRandom", BitangentRandom);
+        propertyBlockOnValidate.SetColor("_Color", Color);
+        propertyBlockOnValidate.SetColor("_AmbientColor", AmbientColor);
+
+        propertyBlockOnValidate.SetFloat("_WaveLocalHorizontalAmplitude", LocalWindAmplitude_Horizontal);
+        propertyBlockOnValidate.SetFloat("_WaveLocalVerticalAmplitude", LocalWindAmplitude_Vertical);
+        //propertyBlock.SetFloat("_WaveStrength", Random.Range(0.04f, 0.06f));
+        //propertyBlock.SetFloat("_WaveSpeed", Random.Range(0.1f, 0.3f));
+
+        renderer.SetPropertyBlock(propertyBlockOnValidate);
     }
 }

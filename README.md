@@ -33,3 +33,11 @@ Unity 2023.2.0b1
 
 <img src="/ShowCase/Grass1.png" alt="drawing" width="350"/> <img src="/ShowCase/Grass2.png" alt="drawing" width="350"/>
 
+### Foliage Shader:
+    -Interactive with player.
+    -Wind Local/world direction, randomize wind or sync wind.
+    -All light support.
+    -Color, texture customizable.
+    -Subsurface scattering support.
+   >**Optimization**: GPU instancing, Occlusion culling, Frustum culling, LOD.
+

@@ -44,6 +44,7 @@ Shader "MyCustom_URP_Shader/URP_OutlinePP"
             {
                 float4 positionCS : SV_POSITION;
                 float2 uv   : TEXCOORD0;
+                
             };
 
 

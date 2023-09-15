@@ -42,7 +42,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _AnimationRenderDistance: 34.46
+    - _AnimationRenderDistance: 30
     - _BiTangentRandom: 1
     - _BitangentRandom: 0
     - _BlendEffect: 1
@@ -50,7 +50,7 @@ Material:
     - _FluffyScale: 2
     - _Gloss: 1
     - _InteractDistance: 1
-    - _InteractStrength: 0.64
+    - _InteractStrength: 0.6
     - _MinMainLightIntensity: 1
     - _NormalRandom: 1
     - _Randomize: 1

@@ -12,13 +12,13 @@ Shader "MyCustom_URP_Shader/URP_StylizeGrass"
 
         [Header(Local animation options)]
         _WaveLocalStrength("Local wind strength", float) = 0.4
-        _WaveLocalSpeed("Local wave speed", Range(0.1, 0.5)) = 0.2
+        _WaveLocalSpeed("Local wave speed", float) = 0.2
         _Randomize("Local cycle random intensity", Range(1,20)) = 20
         _RandomLocalLength("Random amplitude intensity",float) = 0.25
         _WaveLocalDir("Local wind direction", vector) = (0.7,0.7,0,0)
 
         [Header(World animation options)]
-        _WaveWorldSpeed("World wave speed", Range(0.1, 0.5)) = 0.3
+        _WaveWorldSpeed("World wave speed",float) = 0.3
         _WaveWorldStrength("World wind strength", float) = 0.05
         _RandomWorldLength("Random amplitude intensity",float) = 0.25
         _WaveWorldDir("World wind direction", vector) = (1,0,0,0)
@@ -36,8 +36,8 @@ Shader "MyCustom_URP_Shader/URP_StylizeGrass"
         _TerrainMap("Terrain map", 2D)= "white"{}
         _Terrain("Terrain size and offset", vector) = (0,0,0,0)
         _BlendIntensity("Blend intensity", Range(0,1)) = 0.2
-        _InteractGrassDistance("Interact with grass distance", float) = 1
-        _InteractGrassStrength("Interact grass strength",float) = 5
+        _InteractDistance("Interact with grass distance", float) = 1
+        _InteractStrength("Interact grass strength",float) = 5
 
     }
     SubShader

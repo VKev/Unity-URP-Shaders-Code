@@ -33,12 +33,12 @@
 
                 float _WaveLocalSpeed,_WaveLocalStrength;
                 float _Randomize,_RandomLocalLength;
-                float2 _WaveLocalDir;
+                float4 _WaveLocalDir;
 
 
                 float _WaveWorldSpeed,_WaveWorldStrength;
                 float _RandomWorldLength;
-                float2 _WaveWorldDir;
+                float4 _WaveWorldDir;
 
 
                 float _Gloss;
@@ -50,9 +50,8 @@
                 sampler2D _TerrainMap;
                 float4 _Terrain;
                 float _BlendIntensity;
-                float _InteractGrassStrength;
-                
-                float _InteractGrassDistance;
+                float _InteractStrength;
+                float _InteractDistance;
                 float4 _PlayerWpos;
             CBUFFER_END
 
@@ -72,25 +71,25 @@
                 float distanceToCamera = length(_WorldSpaceCameraPos - o.positionWS);
                 if(distanceToCamera < _AnimationRenderDistance){
                 
-                    float3 dir = normalize( _PlayerWpos.xyz - o.positionWS.xyz);
+                    float3 directionToPlayer = normalize( _PlayerWpos.xyz - o.positionWS.xyz);
 
-                    float distanceToInteractGrass = distance(_PlayerWpos.xyz, o.positionWS);
-                    distanceToInteractGrass = 1 - clamp(distanceToInteractGrass,0,_InteractGrassDistance)/_InteractGrassDistance;
+                    float distanceToPlayer = distance(_PlayerWpos.xyz, o.positionWS);
+                    distanceToPlayer = 1 - clamp(distanceToPlayer,0,_InteractDistance)/_InteractDistance;
 
 
                     float3 wPos = GetVertexPositionInputs(v.positionOS.xyz).positionWS;
-                    float random = ( abs(wPos.x+wPos.z)*_Randomize ) ;
+                    float random = Random(wPos,_Randomize) ;
 
-                    v.positionOS.xz += _WaveLocalStrength*(o.uv.y*normalize(_WaveLocalDir.xy)*sin( ( _Time.y + cos( random ) )*_WaveLocalSpeed*2*PI )  +  cos( random)*_RandomLocalLength );
+                    v.positionOS.xz += WindHorizontalOS(v.uv, random, _WaveLocalSpeed,_WaveLocalStrength,_WaveLocalDir);
 
-                    float3 positionWS = GetVertexPositionInputs(v.positionOS.xyz).positionWS;
+                    float3 finalPositionWS = GetVertexPositionInputs(v.positionOS.xyz).positionWS;
 
-                    positionWS.xz -=  dir.xz*distanceToInteractGrass*o.uv.y*_InteractGrassStrength;
+                    finalPositionWS.xz -=  directionToPlayer.xz*distanceToPlayer*o.uv.y*_InteractStrength;
+                    finalPositionWS.y -=  directionToPlayer.y*distanceToPlayer*o.uv.y*1;
 
-                    if (length(_WaveWorldDir.xy)>0 )
-                        positionWS.xz +=  _WaveWorldStrength*( sin( ( _Time.y + (wPos.x)  )*_WaveWorldSpeed*2*PI )*o.uv.y*normalize( _WaveWorldDir.xy) +  cos( random)*_RandomWorldLength );
+                    finalPositionWS.xz +=  WindHorizontalWS(v.uv, random, _WaveWorldSpeed,_WaveWorldStrength,_WaveWorldDir);
 
-                    o.positionCS = TransformWorldToHClip(positionWS);
+                    o.positionCS = TransformWorldToHClip(finalPositionWS);
                 }
                 else{
                     o.positionCS = TransformObjectToHClip(v.positionOS.xyz);
