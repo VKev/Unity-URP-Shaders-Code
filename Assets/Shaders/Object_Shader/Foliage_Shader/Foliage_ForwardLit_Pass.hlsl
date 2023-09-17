@@ -136,6 +136,8 @@ struct appdata
 
                 float4 shadowcoord = TransformWorldToShadowCoord(wPos);
                 Light mainLight = GetMainLight(shadowcoord);
+                //mainLight.shadowAttenuation = mainLight.shadowAttenuation*1.2;
+                
 
                 float3 mainCol =lightingCalculate(N,wPos,1-_Gloss,mainLight)
                                 *Col.rgb

@@ -80,14 +80,14 @@
                     float3 wPos = GetVertexPositionInputs(v.positionOS.xyz).positionWS;
                     float random = Random(wPos,_Randomize) ;
 
-                    v.positionOS.xz += WindHorizontalOS(v.uv, random, _WaveLocalSpeed,_WaveLocalStrength,_WaveLocalDir);
+                    v.positionOS.xz += WindHorizontalOS(v.uv, random, _WaveLocalSpeed,_WaveLocalStrength,_WaveLocalDir).xz;
 
                     float3 finalPositionWS = GetVertexPositionInputs(v.positionOS.xyz).positionWS;
 
                     finalPositionWS.xz -=  directionToPlayer.xz*distanceToPlayer*o.uv.y*_InteractStrength;
                     finalPositionWS.y -=  directionToPlayer.y*distanceToPlayer*o.uv.y*1;
 
-                    finalPositionWS.xz +=  WindHorizontalWS(v.uv, random, _WaveWorldSpeed,_WaveWorldStrength,_WaveWorldDir);
+                    finalPositionWS.xz +=  WindHorizontalWS(v.uv, random, _WaveWorldSpeed,_WaveWorldStrength,_WaveWorldDir).xz;
 
                     o.positionCS = TransformWorldToHClip(finalPositionWS);
                 }

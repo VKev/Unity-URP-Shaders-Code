@@ -3,6 +3,7 @@ Shader "MyCustom_URP_Shader/URP_Water"
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
+        _Depth ("Depth", float) = 0
     }
     SubShader
     {
@@ -22,28 +23,30 @@ Shader "MyCustom_URP_Shader/URP_Water"
 
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
 
 
             struct appdata
             {
-                float4 positionOS   : POSITION;//OS : OBJECT SPACE
+                float4 positionOS   : POSITION;
+                
                 float2 uv : TEXCOORD0;
             };
 
             struct vertOut
             {
-                float4 positionCS  : SV_POSITION;// HCS: H CLIP SPACE
+                float4 positionCS  : SV_POSITION;
                 float2 uv:TEXCOORD0;
-                float4 screenSpace: TEXCOORD1;
+                float4 screenPosition: TEXCOORD1;
             };
 
-            //declare Properties in CBUFFER
-            sampler2D _CameraDepthTexture;
+ 
             sampler2D _CameraOpaqueTexture;
             CBUFFER_START(UnityPerMaterial)
                 
                 sampler2D _MainTex;
                 half4 _BaseColor;
+                float _Depth;
                 
             CBUFFER_END
 
@@ -54,7 +57,7 @@ Shader "MyCustom_URP_Shader/URP_Water"
                 vertOut o;
                 o.uv = v.uv;
                 o.positionCS = TransformObjectToHClip(v.positionOS.xyz);
-                o.screenSpace = ComputeScreenPos(o.positionCS);
+                o.screenPosition = ComputeScreenPos(o.positionCS);
 
                 return o;
             }
@@ -64,11 +67,12 @@ Shader "MyCustom_URP_Shader/URP_Water"
             //float3 _LightDirection;
             half4 frag(vertOut i, FRONT_FACE_TYPE frontFace : FRONT_FACE_SEMANTIC) : SV_Target//get front face of object
             {
-                float2 screenSpaceUV = i.screenSpace.xy/i.screenSpace.w;
-                float4 depth = tex2D(_CameraOpaqueTexture,screenSpaceUV);
-                
+                float2 screenSpaceUV = i.screenPosition.xy/i.screenPosition.w;
+                //i.screenPosition.a -= _Depth;
+                float depth = SampleSceneDepth(screenSpaceUV);
+                //depth = lerp (0,1,depth);
                 //return float4 (_LightDirection,1);
-                return depth;
+                return float4( depth.xxx,0);
                 //return UniversalFragmentBlinnPhong(inputData , surfaceData);
             }
 

@@ -14,13 +14,11 @@ Shader "MyCustom_URP_Shader/URP_StylizeGrass"
         _WaveLocalStrength("Local wind strength", float) = 0.4
         _WaveLocalSpeed("Local wave speed", float) = 0.2
         _Randomize("Local cycle random intensity", Range(1,20)) = 20
-        _RandomLocalLength("Random amplitude intensity",float) = 0.25
         _WaveLocalDir("Local wind direction", vector) = (0.7,0.7,0,0)
 
         [Header(World animation options)]
         _WaveWorldSpeed("World wave speed",float) = 0.3
         _WaveWorldStrength("World wind strength", float) = 0.05
-        _RandomWorldLength("Random amplitude intensity",float) = 0.25
         _WaveWorldDir("World wind direction", vector) = (1,0,0,0)
 
         [Header(Lighting options)]

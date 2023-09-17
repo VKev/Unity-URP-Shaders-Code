@@ -105,6 +105,7 @@ Shader "MyCustom_URP_Shader/URP_OutlinePP"
                 float4 cameraColorObstructTexture = tex2D(_CustomColorObstructTexture,i.uv);
                 float cameraDepthObstructTexture = tex2D(_CustomDepthObstructTexture,i.uv).r;
                 float3 cameraWorldNormalTexture = sampleWorldNormal(i.uv); 
+                
                 //float depth = SampleSceneDepth(i.uv);//depth texture
                 float3 worldPos = ComputeWorldSpacePosition(i.uv, cameraOutlineDepthTexture, UNITY_MATRIX_I_VP);//World Pos texture
                 float3 V = GetWorldSpaceNormalizeViewDir(worldPos);
@@ -168,7 +169,7 @@ Shader "MyCustom_URP_Shader/URP_OutlinePP"
                 float finalEdge;
                 finalEdge = edge;
                 if(cameraOutlineDepthTexture <= cameraDepthObstructTexture && _SeeThroughWall==0){
-                    finalEdge = lerp(edge, 0, cameraColorObstructTexture).r;
+                    finalEdge = lerp(0, edge, cameraDepthObstructTexture*0.0001);
                 }
 
                 float4 finalColor = lerp(cameraColorTexture ,_OutlineColor, finalEdge.xxxx);
@@ -176,7 +177,7 @@ Shader "MyCustom_URP_Shader/URP_OutlinePP"
 
                 //return Col*_ColorTone;
                 return finalColor;
-                //return float4(Col,1);
+                //return float4(finalEdge.xxx,1);
                 //return UniversalFragmentBlinnPhong(inputData , surfaceData);
             }
 
