@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.Rendering;
 
-public class DrawOpaquesDepthPass : ScriptableRenderPass
+public class DrawDepthPass : ScriptableRenderPass
 {
         RTHandle depth;
         readonly int drawDepthID;
@@ -22,7 +22,7 @@ public class DrawOpaquesDepthPass : ScriptableRenderPass
 
 
         readonly List<ShaderTagId> shaderTagIdList;
-        public DrawOpaquesDepthPass(LayerMask outlineMask)
+        public DrawDepthPass(LayerMask outlineMask)
         {
             renderPassEvent = RenderPassEvent.AfterRenderingOpaques;
 

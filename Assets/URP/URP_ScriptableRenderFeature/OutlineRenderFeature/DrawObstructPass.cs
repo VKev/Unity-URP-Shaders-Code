@@ -5,16 +5,14 @@ using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.Rendering;
 
-public class DrawOpaquesObstructPass : ScriptableRenderPass
+public class DrawObstructPass : ScriptableRenderPass
 {
-        RTHandle obstruct;
-        readonly int drawObstructID;
 
         RTHandle depth;
         readonly int drawDepthID;
 
-        RTHandle customObstructTextureRT;
-        readonly int customObstructTextureID;
+        /*RTHandle customObstructTextureRT;
+        readonly int customObstructTextureID;*/
 
         RTHandle customDepthObstructTextureRT;
         readonly int customDepthObstructTextureID;
@@ -24,19 +22,18 @@ public class DrawOpaquesObstructPass : ScriptableRenderPass
         RendererList rendererList;
         DrawingSettings obstructDrawingSettings;
         FilteringSettings obstructFilteringSettings;
-        Material overrideMaterial;
 
 
 
         readonly List<ShaderTagId> shaderTagIdList;
-        public DrawOpaquesObstructPass(LayerMask obstructMask, Material obstructMat)
+        public DrawObstructPass(LayerMask obstructMask)
         {
             renderPassEvent = RenderPassEvent.AfterRenderingOpaques;
 
             //customOpaqueTextureID = Shader.PropertyToID("_CustomOpaqueTexture");
-            drawObstructID = Shader.PropertyToID("_DrawColorObstruct");
+            /*drawObstructID = Shader.PropertyToID("_DrawColorObstruct");*/
             drawDepthID = Shader.PropertyToID("_DrawDepthObstruct");
-            customObstructTextureID = Shader.PropertyToID("_CustomColorObstructTexture");
+            /*customObstructTextureID = Shader.PropertyToID("_CustomColorObstructTexture");*/
             customDepthObstructTextureID = Shader.PropertyToID("_CustomDepthObstructTexture");
 
 
@@ -50,15 +47,15 @@ public class DrawOpaquesObstructPass : ScriptableRenderPass
                     new ShaderTagId("LightweightForward"),
                     new ShaderTagId("SRPDefaultUnlit"),
                 };
-            overrideMaterial = obstructMat;
+            
 
         }
 
         public override void Configure(CommandBuffer cmd, RenderTextureDescriptor cameraTextureDescriptor)
         {
 
-            cmd.GetTemporaryRT(drawObstructID, Screen.width, Screen.height, 32, FilterMode.Point, RenderTextureFormat.RGB565);
-            obstruct = RTHandles.Alloc(new RenderTargetIdentifier(drawObstructID));
+            /*cmd.GetTemporaryRT(drawObstructID, Screen.width, Screen.height, 32, FilterMode.Point, RenderTextureFormat.RGB565);
+            obstruct = RTHandles.Alloc(new RenderTargetIdentifier(drawObstructID));*/
 
             cmd.GetTemporaryRT(drawDepthID, Screen.width, Screen.height, 32, FilterMode.Point, RenderTextureFormat.Depth);
             depth = RTHandles.Alloc(new RenderTargetIdentifier(drawDepthID));
@@ -71,15 +68,15 @@ public class DrawOpaquesObstructPass : ScriptableRenderPass
             cmd.GetTemporaryRT(customDepthObstructTextureID, customDepthTextureDescriptor);
             customDepthObstructTextureRT = RTHandles.Alloc(new RenderTargetIdentifier(customDepthObstructTextureID));
 
-            RenderTextureDescriptor customObstructTextureDescriptor = cameraTextureDescriptor;
+            /*RenderTextureDescriptor customObstructTextureDescriptor = cameraTextureDescriptor;
             customObstructTextureDescriptor.colorFormat = RenderTextureFormat.RGB565;
             customObstructTextureDescriptor.depthStencilFormat = GraphicsFormat.None;
             customObstructTextureDescriptor.depthBufferBits = 0;
             cmd.GetTemporaryRT(customObstructTextureID, customObstructTextureDescriptor);
-            customObstructTextureRT = RTHandles.Alloc(new RenderTargetIdentifier(customObstructTextureID));
+            customObstructTextureRT = RTHandles.Alloc(new RenderTargetIdentifier(customObstructTextureID));*/
 
 
-            ConfigureTarget(obstruct, depth);
+            ConfigureTarget( depth);
             ConfigureClear(ClearFlag.All, Color.black);
 
         }
@@ -93,15 +90,13 @@ public class DrawOpaquesObstructPass : ScriptableRenderPass
 
                 obstructDrawingSettings = CreateDrawingSettings(shaderTagIdList, ref renderingData, renderingData.cameraData.defaultOpaqueSortFlags);
                 //obstructDrawingSettings.overrideMaterial = overrideMaterial;
-                
                 rendererListParams = new RendererListParams(renderingData.cullResults, obstructDrawingSettings, obstructFilteringSettings);
                 rendererList = context.CreateRendererList(ref rendererListParams);
-
                 cmd.DrawRendererList(rendererList);
 
                 cmd.Blit(depth.nameID, customDepthObstructTextureRT.nameID);
 
-                cmd.Blit(obstruct.nameID, customObstructTextureRT.nameID);
+                //cmd.Blit(obstruct.nameID, customObstructTextureRT.nameID);
 
                 //cmd.ClearRenderTarget(RTClearFlags.All, Color.black, 1, 0);
 
@@ -117,14 +112,14 @@ public class DrawOpaquesObstructPass : ScriptableRenderPass
         public override void OnCameraCleanup(CommandBuffer cmd)
         {
 
-            cmd.ReleaseTemporaryRT(drawObstructID);
-            obstruct.Release();
+            /*cmd.ReleaseTemporaryRT(drawObstructID);
+            obstruct.Release();*/
 
             cmd.ReleaseTemporaryRT(drawDepthID);
             depth.Release();
 
-            cmd.ReleaseTemporaryRT(customObstructTextureID);
-            customObstructTextureRT.Release();
+            /*cmd.ReleaseTemporaryRT(customObstructTextureID);
+            customObstructTextureRT.Release();*/
 
             cmd.ReleaseTemporaryRT(customDepthObstructTextureID);
             customDepthObstructTextureRT.Release();

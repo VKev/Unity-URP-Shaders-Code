@@ -64,7 +64,6 @@ Shader "MyCustom_URP_Shader/URP_OutlinePP"
             
             //sampler2D _CustomOpaqueTexture;
             sampler2D _CustomOutlineDepthTexture;
-            sampler2D _CustomColorObstructTexture;
             sampler2D _CustomDepthObstructTexture;
             //float4 _CustomOpaqueTexture_TexelSize;
             //sampler2D _CameraNormalsTexture;
@@ -102,7 +101,6 @@ Shader "MyCustom_URP_Shader/URP_OutlinePP"
                 //float4 mainTex = tex2D(_MainTex,i.uv);
                 float cameraOutlineDepthTexture = tex2D(_CustomOutlineDepthTexture,i.uv).r;
                 float4 cameraColorTexture = tex2D(_CameraOpaqueTexture,i.uv);
-                float4 cameraColorObstructTexture = tex2D(_CustomColorObstructTexture,i.uv);
                 float cameraDepthObstructTexture = tex2D(_CustomDepthObstructTexture,i.uv).r;
                 float3 cameraWorldNormalTexture = sampleWorldNormal(i.uv); 
                 

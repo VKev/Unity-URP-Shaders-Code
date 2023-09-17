@@ -271,8 +271,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 141521391}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.013096757, y: -0.000000059604645, z: 0.000000022351742, w: 0.9999143}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: 0.013096757, y: -0.00000008940697, z: 0.000000018626451, w: 0.9999143}
+  m_LocalPosition: {x: -0.00000020647657, y: 0.000000028783315, z: 0.0000001156822}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -932,8 +932,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 748450155}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.02323372, y: -0.000000059604645, z: 0.000000007450581, w: 0.9997301}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0.02323372, y: -0.000000059604645, z: 0.0000000037252903, w: 0.9997301}
+  m_LocalPosition: {x: -0.00000020647657, y: 0.000000028783315, z: 0.0000001156822}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1918,8 +1918,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1250990589}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.105333805, y: 0.49628785, z: -0.060814504, w: 0.8595957}
-  m_LocalPosition: {x: -3.9135923, y: 2.4939504, z: -2.2595136}
+  m_LocalRotation: {x: 0.105333835, y: 0.4962878, z: -0.060814515, w: 0.8595957}
+  m_LocalPosition: {x: -1.361759, y: 1.6782761, z: -0.78621197}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2387,8 +2387,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1947330597}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.0050933505, y: -0.000000059604638, z: 0.000000014901159, w: 0.999987}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0.0050932686, y: -0.000000059604638, z: 0.0000000037252899, w: 0.999987}
+  m_LocalPosition: {x: -0.00000020647657, y: 0.000000028783315, z: 0.0000001156822}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

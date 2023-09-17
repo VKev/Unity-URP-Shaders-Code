@@ -19,9 +19,8 @@ MonoBehaviour:
     m_Bits: 64
   obstructLayerMask:
     serializedVersion: 2
-    m_Bits: 311
+    m_Bits: 439
   outlineMat: {fileID: 2100000, guid: 2f45529918094b54cbf4c2b709c8de9e, type: 2}
-  obstructMat: {fileID: 2100000, guid: 75937a1d83211104c9bacf0de107c12c, type: 2}
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0

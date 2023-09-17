@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.Rendering;
 
-public class OutlineRenderPass : ScriptableRenderPass
+public class OutlineBlitPass : ScriptableRenderPass
 {
         RTHandle source;
 
@@ -14,7 +14,7 @@ public class OutlineRenderPass : ScriptableRenderPass
         Material outlineMat;
         OutlineVolumeSetting outlineVolumeSetting;
 
-        public OutlineRenderPass(RenderPassEvent passEvent, Material outlineMaterial)
+        public OutlineBlitPass(RenderPassEvent passEvent, Material outlineMaterial)
         {
             outlineMat = outlineMaterial;
             this.renderPassEvent = passEvent;

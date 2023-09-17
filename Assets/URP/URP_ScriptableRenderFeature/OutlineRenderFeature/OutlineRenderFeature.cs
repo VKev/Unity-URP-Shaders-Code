@@ -10,29 +10,26 @@ using UnityEngine.XR;
 
 public class OutlineRenderFeature : ScriptableRendererFeature
 {
-    
 
-    OutlineRenderPass outlineRenderPass = null;
-    DrawOpaquesDepthPass drawOpaquesDepthPass = null;
-    DrawOpaquesObstructPass drawOpaquesObstructPass = null;
+
+    OutlineBlitPass outlineRenderPass = null;
+    DrawDepthPass drawOpaquesDepthPass = null;
+    DrawObstructPass drawOpaquesObstructPass = null;
     //MyCopyDepth copyDepthPass = null;
     [SerializeField] private RenderPassEvent renderPassEvent;
     [SerializeField] private LayerMask outlineLayerMask;
     [SerializeField] private LayerMask obstructLayerMask;
     [SerializeField] public Material outlineMat;
-    [SerializeField] public Material obstructMat;
     /// <inheritdoc/>
     public override void Create()
     {
         if (outlineMat==null)
             outlineMat = new Material(Shader.Find("MyCustom_URP_Shader/URP_OutlinePP"));
 
-        if(obstructMat == null)
-            obstructMat = new Material(Shader.Find("MyCustom_URP_Shader/URP_CullOff"));
          
-        drawOpaquesDepthPass = new DrawOpaquesDepthPass(outlineLayerMask);
-        drawOpaquesObstructPass = new DrawOpaquesObstructPass(obstructLayerMask, obstructMat);
-        outlineRenderPass = new OutlineRenderPass(renderPassEvent, outlineMat);
+        drawOpaquesDepthPass = new DrawDepthPass(outlineLayerMask);
+        drawOpaquesObstructPass = new DrawObstructPass(obstructLayerMask);
+        outlineRenderPass = new OutlineBlitPass(renderPassEvent, outlineMat);
 
     }
     public override void SetupRenderPasses(ScriptableRenderer renderer, in RenderingData renderingData)
