@@ -84,7 +84,7 @@ public class DrawObstructPass : ScriptableRenderPass
         {
             CommandBuffer cmd = CommandBufferPool.Get();
 
-            using (new ProfilingScope(cmd, new ProfilingSampler("Draw _Custom<Color,Depth>ObstructTexture")))
+            using (new ProfilingScope(cmd, new ProfilingSampler("Draw _Custom<Depth>ObstructTexture")))
             {
 
 

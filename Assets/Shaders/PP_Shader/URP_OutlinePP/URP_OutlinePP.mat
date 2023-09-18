@@ -27,7 +27,7 @@ Material:
     m_Floats:
     - _DepthThreshold: 13
     - _NormalThreshold: 0.7
-    - _OutlineSize: 1
+    - _OutlineSize: 2
     - _SeeThroughWall: 0
     m_Colors:
     - _OutlineColor: {r: 1, g: 1, b: 1, a: 1}

@@ -12,7 +12,10 @@ Shader "MyCustom_URP_Shader/URP_Foliage"
 
         [Header(Lighting options)]
         _Gloss("Gloss", Range(0,1)) = 1
+        _SpecularIntensity("Specular Intensity", Range(0,1)) = 1
         _MinMainLightIntensity("Min main light receive", Range(0,1)) = 0.4
+        _ShadowThreshold("Shadow threshold",float) = 0.2
+        _ShadowIntensity("Shadow Intensity",float) = 1.5
 
         [Header(Texture options)]
         _MainTex ("Texture", 2D) = "white" {}
@@ -33,7 +36,6 @@ Shader "MyCustom_URP_Shader/URP_Foliage"
         _WaveWorldAmplitude("World wave amplitude", float) = 0.1
         _WaveWorldSpeed("World wave speed", float) = 1
         _WaveWorldDir("World wind direction", vector) = (0.4,0.4,0,0)
-
 
         [Header(Interact options)]
         _InteractDistance("Interact distance", float) = 1
@@ -59,7 +61,8 @@ Shader "MyCustom_URP_Shader/URP_Foliage"
 
 
             #pragma multi_compile_instancing
-
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE
+            #pragma multi_compile_fragment _ _SHADOWS_SOFT
             //#pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE
             //#pragma multi_compile_fragment _ _SHADOWS_SOFT
 

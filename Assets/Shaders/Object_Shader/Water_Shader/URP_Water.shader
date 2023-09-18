@@ -4,14 +4,17 @@ Shader "MyCustom_URP_Shader/URP_Water"
     {
         _MainTex ("Texture", 2D) = "white" {}
         _Depth ("Depth", float) = 0
+        _SurfaceColor("Surface Color",COLOR) = (0.1 ,0.1 ,0.7 ,1 )
+        _BottomColor("Bottom Color",COLOR) = (0.1 ,0.1 ,0.5 ,1 )
     }
     SubShader
     {
-        Tags {  "RenderType" = "Opaque" 
-                //"Queue" = "Transparent"
+        Tags {  "RenderType" = "Transparent" 
+                "Queue" = "Transparent"
                 "RenderPipeline" = "UniversalPipeline" }
         LOD 100
-
+        ZWrite Off
+        Cull Off
         Pass
         {
             HLSLPROGRAM
@@ -46,6 +49,8 @@ Shader "MyCustom_URP_Shader/URP_Water"
                 
                 sampler2D _MainTex;
                 half4 _BaseColor;
+                half4 _SurfaceColor;
+                half4 _BottomColor;
                 float _Depth;
                 
             CBUFFER_END
@@ -68,11 +73,18 @@ Shader "MyCustom_URP_Shader/URP_Water"
             half4 frag(vertOut i, FRONT_FACE_TYPE frontFace : FRONT_FACE_SEMANTIC) : SV_Target//get front face of object
             {
                 float2 screenSpaceUV = i.screenPosition.xy/i.screenPosition.w;
-                //i.screenPosition.a -= _Depth;
-                float depth = SampleSceneDepth(screenSpaceUV);
-                //depth = lerp (0,1,depth);
-                //return float4 (_LightDirection,1);
-                return float4( depth.xxx,0);
+                
+                float rawDepth = SampleSceneDepth(screenSpaceUV);
+                float sceneEyeDepth = LinearEyeDepth(rawDepth, _ZBufferParams);
+                sceneEyeDepth -= i.screenPosition.a;
+                sceneEyeDepth /= _Depth;
+                sceneEyeDepth = saturate(sceneEyeDepth);
+
+                float4 finalCol = lerp(_BottomColor,_SurfaceColor,1-sceneEyeDepth);
+                
+                
+                return finalCol;
+                //return float4(sceneEyeDepth.xxx,1);
                 //return UniversalFragmentBlinnPhong(inputData , surfaceData);
             }
 

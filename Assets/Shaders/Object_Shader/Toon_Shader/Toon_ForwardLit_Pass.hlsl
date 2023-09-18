@@ -36,27 +36,29 @@
 
             UNITY_INSTANCING_BUFFER_START(props)
                 UNITY_DEFINE_INSTANCED_PROP(float, _Gloss)
+                UNITY_DEFINE_INSTANCED_PROP(float, _RimSize)
+                UNITY_DEFINE_INSTANCED_PROP(float, _RimThreshold)
+                UNITY_DEFINE_INSTANCED_PROP(float, _RimBlur)
                 UNITY_DEFINE_INSTANCED_PROP(float4, _AmbientColor)
             UNITY_INSTANCING_BUFFER_END(props)
 
             CBUFFER_START(UnityPerMaterial)
                 sampler2D _MainTex;
-                float _RimSize,_RimThreshold,_RimBlur;
                 float4 _BaseColor;
                 
                 float _LightMaxIntensity;
                 float _MainLightShadowIntensity;
             CBUFFER_END
 
-            float3 generateToonLightBlinnPhong(float3 N, float3 wPos, float3 V,Light light, float4 ambientColor, float gloss){
+            float3 generateToonLightBlinnPhong(float3 N, float3 wPos, float3 V,Light light, float4 ambientColor, float gloss, float rimSize, float rimBlur, float rimThreshold){
 
                 float3 L = normalize(light.direction); 
                 float3 fresnel = 1-saturate(dot(N,V));//float3 L = normalize(GetAdditionalLight(0,N).direction); 
 
                 float3 LightColor = light.color * min(light.distanceAttenuation , _LightMaxIntensity);
 
-                float3 rim = smoothstep((1-_RimSize) - _RimBlur, (1-_RimSize) +_RimBlur, fresnel);
-                rim *= fresnel*pow( saturate(dot(N,L)),_RimThreshold);
+                float3 rim = smoothstep((1-rimSize) - rimBlur, (1-rimSize) +rimBlur, fresnel);
+                rim *= fresnel*pow( saturate(dot(N,L)),rimThreshold);
 
 
                 float3 deffuseLight = DeffuseLight(N,light);
@@ -85,6 +87,9 @@
 
                 float gloss = UNITY_ACCESS_INSTANCED_PROP(props, _Gloss);
                 float4 ambientColor = UNITY_ACCESS_INSTANCED_PROP(props, _AmbientColor);
+                float rimSize = UNITY_ACCESS_INSTANCED_PROP(props, _RimSize);
+                float rimBlur = UNITY_ACCESS_INSTANCED_PROP(props, _RimBlur);
+                float rimThreshold = UNITY_ACCESS_INSTANCED_PROP(props, _RimThreshold);
 
                 float4 mainTex = tex2D(_MainTex,i.uv);
                 float3 N = normalize(i.normalWS);
@@ -102,7 +107,7 @@
 
 
 
-                float3 baseColor = _BaseColor.rgb*mainTex.xyz*generateToonLightBlinnPhong(N,wPos,V,mainLight,ambientColor,gloss);
+                float3 baseColor = _BaseColor.rgb*mainTex.xyz*generateToonLightBlinnPhong(N,wPos,V,mainLight,ambientColor,gloss,rimSize,rimBlur,rimThreshold);
                 
 
 
@@ -115,7 +120,7 @@
                     {
                         Light AddLight = GetAdditionalLight(lightIndex,wPos,shadowMask);
                         
-                        float3 additionalColor = _BaseColor.rgb*mainTex.xyz*generateToonLightBlinnPhong(N,wPos,V,AddLight,ambientColor,gloss);
+                        float3 additionalColor = _BaseColor.rgb*mainTex.xyz*generateToonLightBlinnPhong(N,wPos,V,AddLight,ambientColor,gloss,rimSize,rimBlur,rimThreshold);
                         lightingData.additionalLightsColor += additionalColor;
                         
                     }

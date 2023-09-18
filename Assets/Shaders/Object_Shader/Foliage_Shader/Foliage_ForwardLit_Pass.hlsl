@@ -41,7 +41,12 @@ struct appdata
                 float _MinMainLightIntensity;
                 float _InteractDistance;
                 float _InteractStrength;
+                float _ShadowThreshold;
+                float _ShadowIntensity;
+                float _SpecularIntensity;
                 sampler2D _MainTex;
+                sampler2D _TerrainTexture;
+                float4 _Terrain;
                 float4 _PlayerWpos;
             CBUFFER_END
             
@@ -115,10 +120,13 @@ struct appdata
                 return o;
             }
 
-            float3 lightingCalculate( float3 N,float3 wPos ,float gloss, Light light){
+            float3 lightingCalculate( float3 N,float3 wPos ,float gloss, Light light,float3 AmbientCol){
                 float3 deffuseLight = DeffuseLight(N, light);
                 float3 specularLight = SpecularLight(N,wPos,gloss, light);
-                return deffuseLight+ specularLight;
+                if(length( deffuseLight) < _ShadowThreshold){
+                    deffuseLight += AmbientCol.rgb* light.color;
+                }
+                return deffuseLight+ specularLight*_SpecularIntensity;
             }
             
 
@@ -137,16 +145,14 @@ struct appdata
                 float4 shadowcoord = TransformWorldToShadowCoord(wPos);
                 Light mainLight = GetMainLight(shadowcoord);
                 //mainLight.shadowAttenuation = mainLight.shadowAttenuation*1.2;
-                
+                if( mainLight.shadowAttenuation<1)
+                    mainLight.shadowAttenuation = saturate (mainLight.shadowAttenuation*_ShadowIntensity);
 
-                float3 mainCol =lightingCalculate(N,wPos,1-_Gloss,mainLight)
+                float3 mainCol =lightingCalculate(N,wPos,1-_Gloss,mainLight,AmbientCol.rgb)
                                 *Col.rgb
                                 * mainLight.color
                                 * mainLight.shadowAttenuation
-                                * min( mainLight.distanceAttenuation,_MinMainLightIntensity) 
-
-                                + AmbientCol.rgb
-                                * mainLight.color;
+                                * min( mainLight.distanceAttenuation,_MinMainLightIntensity)  ;
                 LightingData lightingData = (LightingData)0;
                 lightingData.mainLightColor += mainCol;
 

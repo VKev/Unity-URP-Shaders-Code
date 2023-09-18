@@ -40,6 +40,10 @@ Material:
         m_Texture: {fileID: 2800000, guid: fd7cc7ace8953224ab5b21a4aeeab86b, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _TerrainTexture:
+        m_Texture: {fileID: 8600000, guid: 6a2b289720608e644b7d40a57f2da748, type: 2}
+        m_Scale: {x: 0, y: 0}
+        m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
     - _AnimationRenderDistance: 30
@@ -55,6 +59,9 @@ Material:
     - _MinMainLightIntensity: 1
     - _NormalRandom: 1
     - _Randomize: 1
+    - _ShadowIntensity: 1.5
+    - _ShadowThreshold: 1.24
+    - _SpecularIntensity: 0.5
     - _TangentRandom: 0
     - _WaveAmplitude: 0.15
     - _WaveLocalAmplitude: 0.2
@@ -65,8 +72,9 @@ Material:
     - _WaveWorldAmplitude: 0.1
     - _WaveWorldSpeed: 1
     m_Colors:
-    - _AmbientColor: {r: 0.08312913, g: 0.5566038, b: 0, a: 0}
-    - _Color: {r: 0.22711393, g: 0.4716981, b: 0, a: 1}
+    - Terrain: {r: 100, g: 100, b: -50, a: -50}
+    - _AmbientColor: {r: 0.8679245, g: 0.8679245, b: 0.8679245, a: 0}
+    - _Color: {r: 0.35699618, g: 0.735849, b: 0, a: 1}
     - _NoiseVector1: {r: 1, g: 0, b: 0, a: 0}
     - _NoiseVector2: {r: 0, g: 0.7, b: 0, a: 0}
     - _NoiseVector3: {r: -1.36, g: -5.23, b: 0, a: 0}

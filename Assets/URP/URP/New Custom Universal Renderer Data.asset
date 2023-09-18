@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: OutlinePostProcess
   m_EditorClassIdentifier: 
   m_Active: 1
-  renderPassEvent: 550
+  renderPassEvent: 450
   outlineLayerMask:
     serializedVersion: 2
     m_Bits: 64
   obstructLayerMask:
     serializedVersion: 2
-    m_Bits: 439
+    m_Bits: 183
   outlineMat: {fileID: 2100000, guid: 2f45529918094b54cbf4c2b709c8de9e, type: 2}
 --- !u!114 &11400000
 MonoBehaviour:
