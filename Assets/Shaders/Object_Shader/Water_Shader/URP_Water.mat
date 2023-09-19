@@ -26,12 +26,21 @@ Material:
     - _MainTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
+        m_Offset: {x: 1, y: 1}
     m_Ints: []
     m_Floats:
     - _Depth: 10
+    - _FoamAmount: 1
+    - _FoamCutoff: 2.5
+    - _FoamScale: 2
+    - _FoamSpeed: 0.05
+    - _NoiseNormalStrength: 0.1
+    - _WaveScale: 15
+    - _WaveSpeed: 0.5
+    - _WaveStrength: 0.1
     m_Colors:
-    - _BottomColor: {r: 0, g: 0.12455166, b: 0.3764706, a: 1}
-    - _SurfaceColor: {r: 0.43137255, g: 0.80942976, b: 0.8392157, a: 1}
+    - _BottomColor: {r: 0, g: 0.12455156, b: 0.37647048, a: 1}
+    - _FoamColor: {r: 1, g: 1, b: 1, a: 0.50980395}
+    - _SurfaceColor: {r: 0.43137243, g: 0.80942976, b: 0.8392157, a: 0.35686275}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
