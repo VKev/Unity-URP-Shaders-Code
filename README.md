@@ -50,4 +50,4 @@ Unity 2023.2.0b1
     -Foam customizable
     -Reflection (Updating)
 
-<img src="/ShowCase/Water.png" alt="drawing" width="350"/>
+<img src="/ShowCase/Water.png" alt="drawing" width="700"/>
