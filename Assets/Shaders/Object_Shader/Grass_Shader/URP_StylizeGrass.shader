@@ -23,7 +23,8 @@ Shader "MyCustom_URP_Shader/URP_StylizeGrass"
 
         [Header(Lighting options)]
         _Gloss("Specular gloss", Range(0,1)) = 1
-        _AmbientColor("Ambient color", COLOR) = (0,0,0,0)
+        _DayTimeAmbientColor("Day ambient color", COLOR) = (0,0,0,1)
+        _NightTimeAmbientColor("Night ambient color",COLOR) = (0.5,0.5,0.5,1)
         _DarkThreshold("Dark threshold",Range(0,1)) = 0.6
         _Luminosity("Luminosity",float) = 1
         _TopIntensity("Grass top color intensity",float) = 1.2
@@ -32,6 +33,7 @@ Shader "MyCustom_URP_Shader/URP_StylizeGrass"
         
         [Header(Terrain options)]
         _TerrainMap("Terrain map", 2D)= "white"{}
+        //_TerranID("Terrain ID", Int) = 0
         _Terrain("Terrain size and offset", vector) = (0,0,0,0)
         _BlendIntensity("Blend intensity", Range(0,1)) = 0.2
         _InteractDistance("Interact with grass distance", float) = 1
@@ -65,6 +67,7 @@ Shader "MyCustom_URP_Shader/URP_StylizeGrass"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
             #include "Assets/VkevShaderLib.hlsl"
+            
             
 
             #include "StylizeGrass_ForwardLit_Pass.hlsl"

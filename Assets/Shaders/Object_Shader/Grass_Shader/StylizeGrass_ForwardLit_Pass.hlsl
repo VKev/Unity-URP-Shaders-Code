@@ -1,5 +1,6 @@
             
-            
+
+
             struct appdata
             {
                 float4 positionOS   : POSITION;
@@ -19,9 +20,9 @@
                 UNITY_VERTEX_INPUT_INSTANCE_ID//GPU instancing
             };
 
-            //UNITY_INSTANCING_BUFFER_START(props)
-                //UNITY_DEFINE_INSTANCED_PROP(float4, _Color)
-            //UNITY_INSTANCING_BUFFER_END(props)
+            UNITY_INSTANCING_BUFFER_START(props)
+                UNITY_DEFINE_INSTANCED_PROP(float4, _Terrain)
+            UNITY_INSTANCING_BUFFER_END(props)
             
 
             CBUFFER_START(UnityPerMaterial)
@@ -42,13 +43,13 @@
 
 
                 float _Gloss;
-                half4 _AmbientColor;
+                half4 _DayTimeAmbientColor;
+                half4 _NightTimeAmbientColor;
                 float _TopIntensity;
                 float _Luminosity,_DarkThreshold;
                 float _MinAdditionalLightIntensity,_MinMainLightIntensity;
                 
                 sampler2D _TerrainMap;
-                float4 _Terrain;
                 float _BlendIntensity;
                 float _InteractStrength;
                 float _InteractDistance;
@@ -109,6 +110,7 @@
             half4 frag(vertOut i, FRONT_FACE_TYPE frontFace : FRONT_FACE_SEMANTIC) : SV_Target//get front face of object
             {
                 UNITY_SETUP_INSTANCE_ID(i);//GPU instancing
+                float4 terrainSizeOffset = UNITY_ACCESS_INSTANCED_PROP(props,_Terrain);
                 //float4 col = UNITY_ACCESS_INSTANCED_PROP(props, _Color);
 
                 //float4 terrainHeightTexture = tex2D(_TerrainHeightMap,i.uv);
@@ -129,18 +131,21 @@
                 float3 mainSpecularLight = SpecularLight(i.normalWS,i.positionWS,1-_Gloss,mainLight);
                 mainSpecularLight = clamp(mainSpecularLight,_DarkThreshold,1) *_Luminosity;
 
-
-                float4 terrainTex = tex2D(_TerrainMap, (i.positionWS.xz-_Terrain.zw)/_Terrain.xy);
+                float4 terrainTex = tex2D(_TerrainMap, (i.positionWS.xz-terrainSizeOffset.zw)/terrainSizeOffset.xy);
                 float4 gradientColor = lerp(terrainTex*mainTex/float4( mainSpecularLight,1) + _BottomColor,  (terrainTex*mainTex*_TopIntensity+_TopColor)*float4( mainLight.color,1), saturate( i.uv.y-_BlendIntensity));
 
                 LightingData lightingData = (LightingData)0;
                 float3 baseColor = gradientColor.rgb
                                    
-                                   * mainLight.shadowAttenuation 
+                                   *mainLight.shadowAttenuation 
                                    * mainSpecularLight
-                                   * min( mainLight.distanceAttenuation,_MinMainLightIntensity)
+                                   * min( mainLight.distanceAttenuation,_MinMainLightIntensity);
 
-                                   * _AmbientColor.xyz;
+                if(mainLight.shadowAttenuation <= 0.1){
+                    baseColor += _NightTimeAmbientColor.rgb*gradientColor.rgb;
+                }
+
+                baseColor += _DayTimeAmbientColor.rgb* gradientColor.rgb;
                                    
 
 
@@ -163,8 +168,13 @@
                                                 * AddLight.color
                                                 * AddLight.shadowAttenuation 
                                                 * addSpecularLight
-                                                * _AmbientColor.xyz
                                                 * min(AddLight.distanceAttenuation,_MinAdditionalLightIntensity);
+
+                        if(mainLight.shadowAttenuation <= 0.1){
+                            additionalColor += _NightTimeAmbientColor.rgb*gradientColor.rgb;
+                        }
+
+                        additionalColor += _DayTimeAmbientColor.rgb* gradientColor.rgb;
 
 
                         lightingData.additionalLightsColor += additionalColor;

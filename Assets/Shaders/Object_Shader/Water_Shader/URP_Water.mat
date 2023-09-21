@@ -27,6 +27,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 1, y: 1}
+    - _NormalMap:
+        m_Texture: {fileID: 2800000, guid: 93a742532ff4ff044b92b04ca891b19a, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
     - _Depth: 10
@@ -34,7 +38,11 @@ Material:
     - _FoamCutoff: 2.5
     - _FoamScale: 2
     - _FoamSpeed: 0.05
+    - _Gloss: 1
     - _NoiseNormalStrength: 0.1
+    - _Smoothness: 1.2
+    - _SpecularIntensity: 0.15
+    - _TextureBlend: 1
     - _WaveScale: 15
     - _WaveSpeed: 0.5
     - _WaveStrength: 0.1

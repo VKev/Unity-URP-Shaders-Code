@@ -1,6 +1,6 @@
 	        
             
-
+            #ifdef UNIVERSAL_LIGHTING_INCLUDED
             float LightLambert(float3 normal, Light light){
                 float3 N = normalize( normal);
                 float3 L = normalize(light.direction); 
@@ -12,6 +12,7 @@
                 float3 deffuseLight = lambert;//*light.color * (light.distanceAttenuation * light.shadowAttenuation);
                 return deffuseLight;
             }
+            
 
 
             //*light.color * (light.distanceAttenuation * light.shadowAttenuation) : lightcolor of light
@@ -26,6 +27,7 @@
                 specularLight = pow(specularLight,specularExponent);//*light.color * (light.distanceAttenuation * light.shadowAttenuation);
                 return specularLight;
             }
+            #endif
 
             float Random(float3 positionWS, float randomScale){
                 
@@ -119,6 +121,23 @@
                 float3 surfGrad = surface * (dHdx*crossY + dHdy*crossX);
                 Out = normalize(TangentMatrix[2].xyz - (Strength * surfGrad));
                 Out = TransformWorldToTangent(Out, TangentMatrix);
+            }
+
+            void Unity_NormalFromHeight_World_float(float In, float Strength, float3 Position, float3x3 TangentMatrix, out float3 Out)
+            {
+                float3 worldDerivativeX = ddx(Position);
+                float3 worldDerivativeY = ddy(Position);
+
+                float3 crossX = cross(TangentMatrix[2].xyz, worldDerivativeX);
+                float3 crossY = cross(worldDerivativeY, TangentMatrix[2].xyz);
+                float d = dot(worldDerivativeX, crossY);
+                float sgn = d < 0.0 ? (-1.f) : 1.f;
+                float surface = sgn / max(0.00000000000001192093f, abs(d));
+
+                float dHdx = ddx(In);
+                float dHdy = ddy(In);
+                float3 surfGrad = surface * (dHdx*crossY + dHdy*crossX);
+                Out = normalize(TangentMatrix[2].xyz - (Strength * surfGrad));
             }
 
             

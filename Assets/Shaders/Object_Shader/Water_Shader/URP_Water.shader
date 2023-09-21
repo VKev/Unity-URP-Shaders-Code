@@ -3,6 +3,7 @@ Shader "MyCustom_URP_Shader/URP_Water"
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
+        _TextureBlend("Texture blend Intensity",float) =1
         _Depth ("Depth", float) = 10
         _SurfaceColor("Surface Color",COLOR) = (0.1 ,0.1 ,0.7 ,1 )
         _BottomColor("Bottom Color",COLOR) = (0.1 ,0.1 ,0.5 ,1 )
@@ -16,6 +17,9 @@ Shader "MyCustom_URP_Shader/URP_Water"
         _FoamSpeed("Foam speed",float) = 0.05
         _FoamScale("Foam scale",float) = 2
         _FoamColor("Foam color", COLOR) = (0,0,0,0.5)
+        _Gloss("Gloss", float) = 1
+        _Smoothness("Smoothness",float)=1
+        _SpecularIntensity("Specular Intensity",float) = 0.5
     }
     SubShader
     {
@@ -32,8 +36,7 @@ Shader "MyCustom_URP_Shader/URP_Water"
             #pragma vertex vert
             #pragma fragment frag
 
-
-
+            #define _SPECULAR_COLOR
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
@@ -67,6 +70,7 @@ Shader "MyCustom_URP_Shader/URP_Water"
             CBUFFER_START(UnityPerMaterial)
                 
                 sampler2D _MainTex;
+                float _TextureBlend;
                 float4 _MainTex_ST;
                 half4 _BaseColor;
                 half4 _FoamColor;
@@ -80,6 +84,9 @@ Shader "MyCustom_URP_Shader/URP_Water"
                 float _FoamCutoff;
                 float _FoamSpeed;
                 float _FoamScale;
+                float _SpecularIntensity;
+                float _Gloss;
+                float _Smoothness;
                 float _NoiseNormalStrength;
                 
             CBUFFER_END
@@ -163,11 +170,31 @@ Shader "MyCustom_URP_Shader/URP_Water"
 
                 float4 foamColor = lerp(waterDepthCol, _FoamColor, foamCutoff);
 
+
+                float4 mainTex = tex2D(_MainTex,i.waterUV);
                 float4 finalCol = lerp(waterDistortionCol, foamColor, foamColor.a);
+                finalCol = lerp(mainTex,finalCol,_TextureBlend);
+
+
+
+
+                float3 gradientNoiseNormalWS;
+                Unity_NormalFromHeight_World_float(waterGradientNoise,0.1,i.positionWS,tangentMatrix,gradientNoiseNormalWS);
+
+                InputData inputData = (InputData)0;//declare InputData struct
+                inputData.normalWS = gradientNoiseNormalWS;// if front face return 1 else return -1
+                //inputData.positionWS = i.positionWS;
+                inputData.viewDirectionWS = GetWorldSpaceNormalizeViewDir(i.positionWS);//get view dir base on positionWS
+               
+                SurfaceData surfaceData = (SurfaceData)0;//declare SurfaceData 
+                surfaceData.albedo = float3(0,0,0);
+                surfaceData.alpha = 1;
+                surfaceData.specular = _Gloss;
+                surfaceData.smoothness = _Smoothness;
                 
-                //return gradientNoise;
-               return finalCol;
-                //return UniversalFragmentBlinnPhong(inputData , surfaceData);
+               //return float4( gradientNoiseNormalWS,1);
+               return finalCol +UniversalFragmentBlinnPhong(inputData , surfaceData)*_SpecularIntensity;
+               //return UniversalFragmentBlinnPhong(inputData , surfaceData);
             }
 
             ENDHLSL
