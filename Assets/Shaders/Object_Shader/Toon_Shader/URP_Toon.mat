@@ -44,7 +44,7 @@ Material:
     - _SpecularBlur: 0.05
     - _SpecularSmoothness: 0.87
     m_Colors:
-    - _AmbientColor: {r: 0.6603774, g: 0.6603774, b: 0.6603774, a: 0}
-    - _BaseColor: {r: 0.9716981, g: 0.9716981, b: 0.9716981, a: 1}
+    - _AmbientColor: {r: 1, g: 1, b: 1, a: 0}
+    - _BaseColor: {r: 0.6792453, g: 0.6792453, b: 0.6792453, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

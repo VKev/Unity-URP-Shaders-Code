@@ -3,6 +3,8 @@ Using shader code, Non-shader graph
 
 Unity 2023.2.0b1
 
+## License
+Free, use any where you like. bBt not for commercial. 
 
 
 ### Toon Shader:

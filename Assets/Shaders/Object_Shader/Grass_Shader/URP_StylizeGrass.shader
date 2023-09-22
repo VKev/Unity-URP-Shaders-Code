@@ -25,6 +25,7 @@ Shader "MyCustom_URP_Shader/URP_StylizeGrass"
         _Gloss("Specular gloss", Range(0,1)) = 1
         _DayTimeAmbientColor("Day ambient color", COLOR) = (0,0,0,1)
         _NightTimeAmbientColor("Night ambient color",COLOR) = (0.5,0.5,0.5,1)
+        _NightAmbientThreshold("Night ambient threshold",float) = 0.5
         _DarkThreshold("Dark threshold",Range(0,1)) = 0.6
         _Luminosity("Luminosity",float) = 1
         _TopIntensity("Grass top color intensity",float) = 1.2

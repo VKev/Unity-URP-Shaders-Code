@@ -45,6 +45,7 @@
                 float _Gloss;
                 half4 _DayTimeAmbientColor;
                 half4 _NightTimeAmbientColor;
+                float _NightAmbientThreshold;
                 float _TopIntensity;
                 float _Luminosity,_DarkThreshold;
                 float _MinAdditionalLightIntensity,_MinMainLightIntensity;
@@ -132,20 +133,20 @@
                 mainSpecularLight = clamp(mainSpecularLight,_DarkThreshold,1) *_Luminosity;
 
                 float4 terrainTex = tex2D(_TerrainMap, (i.positionWS.xz-terrainSizeOffset.zw)/terrainSizeOffset.xy);
-                float4 gradientColor = lerp(terrainTex*mainTex/float4( mainSpecularLight,1) + _BottomColor,  (terrainTex*mainTex*_TopIntensity+_TopColor)*float4( mainLight.color,1), saturate( i.uv.y-_BlendIntensity));
+                float4 gradientColor = lerp(terrainTex*mainTex/float4( mainSpecularLight,1) + _BottomColor,  (terrainTex*mainTex*_TopIntensity+_TopColor), saturate( i.uv.y-_BlendIntensity));
 
                 LightingData lightingData = (LightingData)0;
                 float3 baseColor = gradientColor.rgb
-                                   
+                                   *float4( mainLight.color,1)
                                    *mainLight.shadowAttenuation 
                                    * mainSpecularLight
                                    * min( mainLight.distanceAttenuation,_MinMainLightIntensity);
 
-                if(mainLight.shadowAttenuation <= 0.1){
+                if(mainLight.shadowAttenuation <= _NightAmbientThreshold){
                     baseColor += _NightTimeAmbientColor.rgb*gradientColor.rgb;
                 }
-
-                baseColor += _DayTimeAmbientColor.rgb* gradientColor.rgb;
+                else
+                    baseColor += _DayTimeAmbientColor.rgb* gradientColor.rgb;
                                    
 
 
@@ -173,8 +174,8 @@
                         if(mainLight.shadowAttenuation <= 0.1){
                             additionalColor += _NightTimeAmbientColor.rgb*gradientColor.rgb;
                         }
-
-                        additionalColor += _DayTimeAmbientColor.rgb* gradientColor.rgb;
+                        else
+                            additionalColor += _DayTimeAmbientColor.rgb* gradientColor.rgb;
 
 
                         lightingData.additionalLightsColor += additionalColor;
