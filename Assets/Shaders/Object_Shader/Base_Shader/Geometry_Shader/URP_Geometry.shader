@@ -60,7 +60,7 @@ Shader "Unlit/URP_Geometry"
             {
                 vertOut o;
                 
-                o.positionWS = GetVertexPositionInputs(v.positionOS.xyz).positionWS;;
+                o.positionWS = GetVertexPositionInputs(v.positionOS.xyz).positionWS;
                 o.positionCS = TransformObjectToHClip(v.positionOS.xyz);
 
                 //VertexNormalInputs normalInput = GetVertexNormalInputs(v.normalOS, v.tangentOS);

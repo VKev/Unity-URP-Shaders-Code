@@ -4,7 +4,7 @@ Shader "MyCustom_URP_Shader/URP_Toon"
     {
         [Header(Color options)]
         _MainTex ("Texture", 2D) = "white" {}
-        _BaseColor("Base Color", COLOR) = (1, 1, 1, 1)
+        _Color("Base Color", COLOR) = (1, 1, 1, 1)
 
         [Header(Lighting options)]
         _AmbientColor("Ambient Color", COLOR) = (0,0,0,0)

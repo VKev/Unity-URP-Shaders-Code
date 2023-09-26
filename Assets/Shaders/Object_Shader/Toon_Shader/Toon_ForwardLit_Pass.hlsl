@@ -40,11 +40,11 @@
                 UNITY_DEFINE_INSTANCED_PROP(float, _RimThreshold)
                 UNITY_DEFINE_INSTANCED_PROP(float, _RimBlur)
                 UNITY_DEFINE_INSTANCED_PROP(float4, _AmbientColor)
+                UNITY_DEFINE_INSTANCED_PROP(float4, _Color)
             UNITY_INSTANCING_BUFFER_END(props)
 
             CBUFFER_START(UnityPerMaterial)
                 sampler2D _MainTex;
-                float4 _BaseColor;
                 
                 float _LightMaxIntensity;
                 float _MainLightShadowIntensity;
@@ -87,6 +87,7 @@
 
                 float gloss = UNITY_ACCESS_INSTANCED_PROP(props, _Gloss);
                 float4 ambientColor = UNITY_ACCESS_INSTANCED_PROP(props, _AmbientColor);
+                float4 Col = UNITY_ACCESS_INSTANCED_PROP(props, _Color);
                 float rimSize = UNITY_ACCESS_INSTANCED_PROP(props, _RimSize);
                 float rimBlur = UNITY_ACCESS_INSTANCED_PROP(props, _RimBlur);
                 float rimThreshold = UNITY_ACCESS_INSTANCED_PROP(props, _RimThreshold);
@@ -107,7 +108,7 @@
 
 
 
-                float3 baseColor = _BaseColor.rgb*mainTex.xyz*generateToonLightBlinnPhong(N,wPos,V,mainLight,ambientColor,gloss,rimSize,rimBlur,rimThreshold);
+                float3 baseColor = Col.rgb*mainTex.xyz*generateToonLightBlinnPhong(N,wPos,V,mainLight,ambientColor,gloss,rimSize,rimBlur,rimThreshold);
                 
 
 
@@ -120,7 +121,7 @@
                     {
                         Light AddLight = GetAdditionalLight(lightIndex,wPos,shadowMask);
                         
-                        float3 additionalColor = _BaseColor.rgb*mainTex.xyz*generateToonLightBlinnPhong(N,wPos,V,AddLight,ambientColor,gloss,rimSize,rimBlur,rimThreshold);
+                        float3 additionalColor = Col.rgb*mainTex.xyz*generateToonLightBlinnPhong(N,wPos,V,AddLight,ambientColor,gloss,rimSize,rimBlur,rimThreshold);
                         lightingData.additionalLightsColor += additionalColor;
                         
                     }

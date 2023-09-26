@@ -6,6 +6,7 @@ public class Toon_PropertiesManager : MonoBehaviour
 {
     MaterialPropertyBlock propertyBlock;
     public float Gloss = 1;
+    public Color Color = new Color(200,200,200,1)/255;
     public Color AmbientColor = new Color(168,168,168,1)/255;
 
     public float RimSize;
@@ -21,6 +22,7 @@ public class Toon_PropertiesManager : MonoBehaviour
 
         propertyBlock.SetFloat("_Gloss", Gloss);
         propertyBlock.SetColor("_AmbientColor", AmbientColor);
+        propertyBlock.SetColor("_Color", Color);
         propertyBlock.SetFloat("_RimSize", RimSize);
         propertyBlock.SetFloat("_RimBlur", RimBlur);
         propertyBlock.SetFloat("_RimThreshold", RimThreshold);
@@ -39,6 +41,7 @@ public class Toon_PropertiesManager : MonoBehaviour
 
         propertyBlock.SetFloat("_Gloss", Gloss);
         propertyBlock.SetColor("_AmbientColor", AmbientColor);
+        propertyBlock.SetColor("_Color", Color);
         propertyBlock.SetFloat("_RimSize", RimSize);
         propertyBlock.SetFloat("_RimBlur", RimBlur);
         propertyBlock.SetFloat("_RimThreshold", RimThreshold);

@@ -137,7 +137,7 @@
 
                 LightingData lightingData = (LightingData)0;
                 float3 baseColor = gradientColor.rgb
-                                   *float4( mainLight.color,1)
+                                   *( mainLight.color)
                                    *mainLight.shadowAttenuation 
                                    * mainSpecularLight
                                    * min( mainLight.distanceAttenuation,_MinMainLightIntensity);
