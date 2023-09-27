@@ -37,10 +37,19 @@ Shader "MyCustom_URP_Shader/URP_Tesselation" {
             #define TESSELLATION_FACTORS_INCLUDED
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+            #include "Assets/VkevShaderLib.hlsl"
 
             struct Attributes {
                 float3 positionOS : POSITION;
                 float3 normalOS : NORMAL;
+                float2 uv: TEXCOORD0;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+            };
+
+            struct TessellationControlPoint {
+                float3 positionWS : INTERNALTESSPOS;
+                float3 normalWS : NORMAL;
+                float2 uv: TEXCOORD0;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
@@ -49,13 +58,9 @@ Shader "MyCustom_URP_Shader/URP_Tesselation" {
                 float inside : SV_InsideTessFactor;
             };
 
-            struct TessellationControlPoint {
-                float3 positionWS : INTERNALTESSPOS;
-                float3 normalWS : NORMAL;
-                UNITY_VERTEX_INPUT_INSTANCE_ID
-            };
+            
 
-            struct Interpolators {
+            struct domaOut {
                 float3 normalWS                 : TEXCOORD0;
                 float3 positionWS               : TEXCOORD1;
                 float4 positionCS               : SV_POSITION;
@@ -91,7 +96,7 @@ Shader "MyCustom_URP_Shader/URP_Tesselation" {
 
                 VertexPositionInputs posnInputs = GetVertexPositionInputs(input.positionOS);
                 VertexNormalInputs normalInputs = GetVertexNormalInputs(input.normalOS);
-
+                output.uv = input.uv;
                 output.positionWS = posnInputs.positionWS;
                 output.normalWS = normalInputs.normalWS;
                 return output;
@@ -145,12 +150,12 @@ Shader "MyCustom_URP_Shader/URP_Tesselation" {
             // The domain function runs once per vertex in the final, tessellated mesh
             // Use it to reposition vertices and prepare for the fragment stage
             [domain("tri")] // Signal we're inputting triangles
-            Interpolators Domain(
+            domaOut Domain(
                 TessellationFactors factors, // The output of the patch constant function
                 OutputPatch<TessellationControlPoint, 3> patch, // The Input triangle
                 float3 barycentricCoordinates : SV_DomainLocation) { // The barycentric coordinates of the vertex on the triangle
 
-                Interpolators output;
+                domaOut output;
 
                 // Setup instancing and stereo support (for VR)
                 UNITY_SETUP_INSTANCE_ID(patch[0]);
@@ -159,7 +164,10 @@ Shader "MyCustom_URP_Shader/URP_Tesselation" {
 
                 float3 positionWS = BARYCENTRIC_INTERPOLATE(positionWS);
                 float3 normalWS = BARYCENTRIC_INTERPOLATE(normalWS);
-
+                float2 uv = BARYCENTRIC_INTERPOLATE(uv);
+                float waterGradientNoise;
+                Unity_GradientNoise_float(uv, 20, waterGradientNoise);
+                positionWS.y +=sin(_Time.y )*waterGradientNoise;
                 output.positionCS = TransformWorldToHClip(positionWS);
                 output.normalWS = normalWS;
                 output.positionWS = positionWS;
@@ -167,7 +175,7 @@ Shader "MyCustom_URP_Shader/URP_Tesselation" {
                 return output;
             }
 
-            float4 Fragment(Interpolators input) : SV_Target{
+            float4 Fragment(domaOut input) : SV_Target{
                 UNITY_SETUP_INSTANCE_ID(input);
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
 
@@ -188,6 +196,7 @@ Shader "MyCustom_URP_Shader/URP_Tesselation" {
                 surface.occlusion = 1;
 
                 return UniversalFragmentPBR(lightingInput, surface);
+                //return float4(normalize(input.normalWS),1);
             }
 
             #endif
