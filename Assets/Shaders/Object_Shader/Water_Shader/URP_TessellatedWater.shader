@@ -22,6 +22,7 @@ Shader "MyCustom_URP_Shader/URP_TessellatedWater" {
         _Gloss("Gloss", float) = 1
         _Smoothness("Smoothness",float)=1
         _SpecularIntensity("Specular Intensity",float) = 0.15
+        _WaterShadow("Shadow Intensity",float) = -0.5
     }
     SubShader{
         Tags{"RenderType" = "Transparent" "Queue" = "Transparent" "RenderPipeline" = "UniversalPipeline" "IgnoreProjector" = "True"}
@@ -113,6 +114,7 @@ Shader "MyCustom_URP_Shader/URP_TessellatedWater" {
                 float _Gloss;
                 float _Smoothness;
                 float _NoiseNormalStrength;
+                float _WaterShadow;
             CBUFFER_END
 
             float3 GetViewDirectionFromPosition(float3 positionWS) {
@@ -283,7 +285,7 @@ Shader "MyCustom_URP_Shader/URP_TessellatedWater" {
 
                
                 SurfaceData surfaceData = (SurfaceData)0;//declare SurfaceData 
-                surfaceData.albedo = float3(0,0,0);
+                surfaceData.albedo = float3(1,1,1)*_WaterShadow;
                 surfaceData.alpha = 1;
                 surfaceData.specular = _Gloss;
                 surfaceData.smoothness = _Smoothness;

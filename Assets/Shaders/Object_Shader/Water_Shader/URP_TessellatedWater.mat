@@ -39,9 +39,10 @@ Material:
     - _Gloss: 1
     - _NoiseNormalStrength: 0.1
     - _PARTITIONING: 0
-    - _Smoothness: 1.2
+    - _Smoothness: 1
     - _SpecularIntensity: 0.15
     - _TextureBlend: 1
+    - _WaterShadow: -0.5
     - _WaveScale: 15
     - _WaveSpeed: 0.5
     - _WaveStrength: 0.05

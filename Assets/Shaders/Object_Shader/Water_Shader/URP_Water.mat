@@ -43,6 +43,7 @@ Material:
     - _Smoothness: 1.2
     - _SpecularIntensity: 0.15
     - _TextureBlend: 1
+    - _WaterShadow: -0.6
     - _WaveScale: 15
     - _WaveSpeed: 0.5
     - _WaveStrength: 0.1

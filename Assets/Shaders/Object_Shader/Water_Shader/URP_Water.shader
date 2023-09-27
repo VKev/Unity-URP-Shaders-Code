@@ -5,21 +5,22 @@ Shader "MyCustom_URP_Shader/URP_Water"
         _MainTex ("Texture", 2D) = "white" {}
         _TextureBlend("Texture blend Intensity",float) =1
         _Depth ("Depth", float) = 10
-        _SurfaceColor("Surface Color",COLOR) = (0.1 ,0.1 ,0.7 ,1 )
+        _SurfaceColor("Surface Color",COLOR) = (0.4 ,0.9 ,1 ,0.27 )
         _BottomColor("Bottom Color",COLOR) = (0.1 ,0.1 ,0.5 ,1 )
 
         _WaveSpeed("Wave speed", float) = 0.5
         _WaveScale("Wave scale", float) = 15
-        _WaveStrength("Wave damping", float) = 1
+        _WaveStrength("Wave damping", float) = 0.1
         _NoiseNormalStrength("Wave strength", float) = 0.1
         _FoamAmount("Foam amount",float) = 1
         _FoamCutoff("Foam cutoff",float) = 2.5
         _FoamSpeed("Foam speed",float) = 0.05
         _FoamScale("Foam scale",float) = 2
-        _FoamColor("Foam color", COLOR) = (0,0,0,0.5)
+        _FoamColor("Foam color", COLOR) = (1,1,1,0.5)
         _Gloss("Gloss", float) = 1
         _Smoothness("Smoothness",float)=1
-        _SpecularIntensity("Specular Intensity",float) = 0.5
+        _SpecularIntensity("Specular Intensity",float) = 0.15
+        _WaterShadow("Shadow Intensity",float) = -0.5
     }
     SubShader
     {
@@ -88,7 +89,7 @@ Shader "MyCustom_URP_Shader/URP_Water"
                 float _Gloss;
                 float _Smoothness;
                 float _NoiseNormalStrength;
-                
+                float _WaterShadow;
             CBUFFER_END
 
             
@@ -187,7 +188,7 @@ Shader "MyCustom_URP_Shader/URP_Water"
                 inputData.viewDirectionWS = GetWorldSpaceNormalizeViewDir(i.positionWS);//get view dir base on positionWS
                
                 SurfaceData surfaceData = (SurfaceData)0;//declare SurfaceData 
-                surfaceData.albedo = float3(0,0,0);
+                surfaceData.albedo = float3(1,1,1)*_WaterShadow;
                 surfaceData.alpha = 1;
                 surfaceData.specular = _Gloss;
                 surfaceData.smoothness = _Smoothness;
