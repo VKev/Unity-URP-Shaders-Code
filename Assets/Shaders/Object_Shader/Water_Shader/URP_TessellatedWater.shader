@@ -1,9 +1,11 @@
 Shader "MyCustom_URP_Shader/URP_TessellatedWater" {
     Properties{
-        _FactorEdge1("Edge factors", Vector) = (1, 1, 1, 0)
+        _FactorEdge1("Edge factors", Vector) = (3, 3, 3, 0)
 
         _FactorInside("Inside factor", Float) = 1
 
+        _InteractFactorInside("Interact_ Inside factor", Float) = 10
+        _InteractTessellatedRange("Interact_ Tessellated Range", float) = 1.5
         _MainTex ("Texture", 2D) = "white" {}
         _TextureBlend("Texture blend Intensity",float) =1
         _Depth ("Depth", float) = 10
@@ -115,6 +117,9 @@ Shader "MyCustom_URP_Shader/URP_TessellatedWater" {
                 float _Smoothness;
                 float _NoiseNormalStrength;
                 float _WaterShadow;
+                float _InteractFactorInside;
+                float _InteractTessellatedRange;
+                float4 _PlayerWpos;
             CBUFFER_END
 
             float3 GetViewDirectionFromPosition(float3 positionWS) {
@@ -156,12 +161,27 @@ Shader "MyCustom_URP_Shader/URP_TessellatedWater" {
             TessellationFactors PatchConstantFunction(
                 InputPatch<TessellationControlPoint, 3> patch) {
                 UNITY_SETUP_INSTANCE_ID(patch[0]); // Set up instancing
-                // Calculate tessellation factors
+
+                float distance1 = distance(_PlayerWpos.xyz, patch[0].positionWS);
+                float distance2 = distance(_PlayerWpos.xyz, patch[1].positionWS);
+                float distance3 = distance(_PlayerWpos.xyz, patch[2].positionWS);
+                float distance =  min(min(distance1, distance2), distance3);
+                float distanceToPlayer1 = distance;
+                distanceToPlayer1 = 1 - clamp(distanceToPlayer1,0,_InteractTessellatedRange)/_InteractTessellatedRange;
+
                 TessellationFactors f;
-                f.edge[0] = _FactorEdge1.x;
-                f.edge[1] = _FactorEdge1.y;
-                f.edge[2] = _FactorEdge1.z;
-                f.inside = _FactorInside;
+                if(distanceToPlayer1 >0){
+                    f.edge[0] = _FactorEdge1.x;
+                    f.edge[1] = _FactorEdge1.y;
+                    f.edge[2] = _FactorEdge1.z;
+                    f.inside = _InteractFactorInside;
+                }else{
+                    f.edge[0] = _FactorEdge1.x;
+                    f.edge[1] = _FactorEdge1.y;
+                    f.edge[2] = _FactorEdge1.z;
+                    f.inside = _FactorInside;
+                }
+
                 return f;
             }
 
@@ -171,7 +191,7 @@ Shader "MyCustom_URP_Shader/URP_TessellatedWater" {
             [outputcontrolpoints(3)] // Triangles have three points
             [outputtopology("triangle_cw")] // Signal we're outputting triangles
             [patchconstantfunc("PatchConstantFunction")] // Register the patch constant function
-            [partitioning("integer")]
+             [partitioning("integer")]
             TessellationControlPoint Hull(
                 InputPatch<TessellationControlPoint, 3> patch, // Input triangle
                 uint id : SV_OutputControlPointID) { // Vertex index on the triangle

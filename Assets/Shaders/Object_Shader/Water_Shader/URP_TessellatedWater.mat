@@ -31,16 +31,21 @@ Material:
     m_Ints: []
     m_Floats:
     - _Depth: 10
-    - _FactorInside: 5
+    - _FactorInside: 1
+    - _FactorInsidePlayer: 1
     - _FoamAmount: 1
     - _FoamCutoff: 2.5
     - _FoamScale: 2
     - _FoamSpeed: 0.05
     - _Gloss: 1
+    - _InteractFactorInside: 10
+    - _InteractTessellatedRange: 1.5
     - _NoiseNormalStrength: 0.1
     - _PARTITIONING: 0
     - _Smoothness: 1
     - _SpecularIntensity: 0.15
+    - _TessellatedPlayerRange: 1
+    - _TessellatedRange: 1.5
     - _TextureBlend: 1
     - _WaterShadow: -0.5
     - _WaveScale: 15
