@@ -25,6 +25,8 @@ Shader "MyCustom_URP_Shader/URP_TessellatedWater" {
         _Smoothness("Smoothness",float)=1
         _SpecularIntensity("Specular Intensity",float) = 0.15
         _WaterShadow("Shadow Intensity",float) = -0.5
+
+        _RefractionCut("Refraction Cut", float) = 1
     }
     SubShader{
         Tags{"RenderType" = "Transparent" "Queue" = "Transparent" "RenderPipeline" = "UniversalPipeline" "IgnoreProjector" = "True"}
@@ -87,6 +89,7 @@ Shader "MyCustom_URP_Shader/URP_TessellatedWater" {
                 float2 waterUV:TEXCOORD0;
                 float2 foamUV:TEXCOORD5;
                 float4 screenPosition: TEXCOORD1;
+                float4 screenPositionReal: TEXCOORD6;
                 float3 normalWS: NORMAL;
                 float3 tangentWS : TEXCOORD3;
                 float3 biTangent : TEXCOORD2;
@@ -119,6 +122,7 @@ Shader "MyCustom_URP_Shader/URP_TessellatedWater" {
                 float _WaterShadow;
                 float _InteractFactorInside;
                 float _InteractTessellatedRange;
+                float _RefractionCut;
                 float4 _PlayerWpos;
             CBUFFER_END
 
@@ -234,6 +238,7 @@ Shader "MyCustom_URP_Shader/URP_TessellatedWater" {
 
                 output.waterUV = waterUV;
                 output.foamUV = foamUV;
+                output.screenPositionReal = ComputeScreenPos(TransformWorldToHClip(positionWS));
                 output.screenPosition = screenPosition;
                 output.tangentWS = tangentWS;
                 output.positionCS = TransformWorldToHClip(positionWS);
@@ -258,8 +263,9 @@ Shader "MyCustom_URP_Shader/URP_TessellatedWater" {
                 
                 float rawDepth = SampleSceneDepth(screenSpaceUV);
                 float depthFade = DepthFade(rawDepth,_Depth, i.screenPosition);
-                float4 waterDepthCol = lerp(_BottomColor,_SurfaceColor,1-depthFade);
-
+                float RefractionCut = depthFade <=0 ? 0:1;
+                float4 waterDepthCol = lerp(_BottomColor,_SurfaceColor,(1-depthFade));
+                
 
 
 
@@ -272,9 +278,16 @@ Shader "MyCustom_URP_Shader/URP_TessellatedWater" {
                 gradientNoiseNormal *= _NoiseNormalStrength;
 
                 gradientNoiseNormal += i.screenPosition.xyz ;
-                float4 gradientNoiseScreenPos = float4(gradientNoiseNormal,i.screenPosition.w );
-                float4 waterDistortionCol = tex2Dproj(_CameraOpaqueTexture,gradientNoiseScreenPos);
 
+                float4 gradientNoiseScreenPos = float4(gradientNoiseNormal,i.screenPosition.w );
+
+                float2 noiseScreenSpaceUV = gradientNoiseScreenPos.xy/gradientNoiseScreenPos.w;
+                float noiseRawDepth = SampleSceneDepth(noiseScreenSpaceUV);
+                float noiseRefractionCut = DepthFade(noiseRawDepth,_RefractionCut, gradientNoiseScreenPos) <1 ? 0:1;
+
+                
+                float4 waterDistortionCol = tex2Dproj(_CameraOpaqueTexture,gradientNoiseScreenPos);
+                waterDistortionCol = lerp( tex2Dproj( _CameraOpaqueTexture, i.screenPositionReal ), waterDistortionCol, noiseRefractionCut);
 
 
                 float foamDepthFade = DepthFade(rawDepth,_FoamAmount, i.screenPosition);
@@ -284,8 +297,8 @@ Shader "MyCustom_URP_Shader/URP_TessellatedWater" {
                 Unity_GradientNoise_float(i.foamUV, 1, foamGradientNoise);
 
                 float foamCutoff = step(foamDepthFade, foamGradientNoise);
-                foamCutoff *= _FoamColor.a;
-
+                foamCutoff *= _FoamColor.a*RefractionCut;
+                
                 float4 foamColor = lerp(waterDepthCol, _FoamColor, foamCutoff);
 
 
@@ -310,8 +323,8 @@ Shader "MyCustom_URP_Shader/URP_TessellatedWater" {
                 surfaceData.specular = _Gloss;
                 surfaceData.smoothness = _Smoothness;
                 
-               //return float4( gradientNoiseNormalWS,1);
-               return finalCol +UniversalFragmentBlinnPhong(inputData , surfaceData)*_SpecularIntensity;
+                //return (RefractionCut*foamCutoff);
+                return finalCol +UniversalFragmentBlinnPhong(inputData , surfaceData)*_SpecularIntensity;
                 //return float4(normalize(input.normalWS),1);
             }
 
