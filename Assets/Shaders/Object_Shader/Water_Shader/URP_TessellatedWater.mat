@@ -82,7 +82,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ReflectionMap:
-        m_Texture: {fileID: 8900000, guid: 86ad096f5f00be34bb6c3f037f18fe80, type: 3}
+        m_Texture: {fileID: 8900000, guid: 528cbf70d5823884e899ab939752b520, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SpecGlossMap:
@@ -138,7 +138,7 @@ Material:
     - _Parallax: 0.005
     - _QueueOffset: 0
     - _ReceiveShadows: 1
-    - _ReflectionIntensity: 0.4
+    - _ReflectionIntensity: 0.3
     - _ReflectionNormalIntensity: 0.3
     - _RefractionCut: 0
     - _Smoothness: 1
@@ -165,6 +165,6 @@ Material:
     - _FactorEdge1: {r: 3, g: 3, b: 3, a: 0}
     - _FoamColor: {r: 1, g: 1, b: 1, a: 0.44705883}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
-    - _SurfaceColor: {r: 0.38113186, g: 0.9399606, b: 1, a: 0.38431373}
+    - _SurfaceColor: {r: 0.38113183, g: 0.9399606, b: 1, a: 0.23921569}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

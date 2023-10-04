@@ -29,7 +29,7 @@ Shader "MyCustom_URP_Shader/URP_TessellatedWater" {
         _RefractionCut("Refraction Cut", float) = 1
 
         _ReflectionMap ("Reflection Map", Cube) = ""
-        _ReflectionIntensity("Reflection Intensity", float) = 0.5
+        _ReflectionIntensity("Reflection Intensity", float) = 0.3
         _ReflectionNormalIntensity("Reflection Normal Intensity", float) = 0.3
     }
     SubShader{
@@ -302,7 +302,6 @@ Shader "MyCustom_URP_Shader/URP_TessellatedWater" {
                 waterDistortionCol = lerp( tex2Dproj( _CameraOpaqueTexture, i.screenPositionReal ), waterDistortionCol, noiseRefractionCut);
 
                 float3 viewDir = GetWorldSpaceNormalizeViewDir(i.positionWS);
-                float3 normal = _ReflectionNormalIntensity*normalize( gradientNoiseNormal);
                 float3 reflectedDir = reflect( -viewDir, i.inverseNormalDir);
                 float4 reflectionCol = texCUBE(_ReflectionMap, reflectedDir);
                 waterDistortionCol = lerp(waterDistortionCol ,reflectionCol, _ReflectionIntensity );
