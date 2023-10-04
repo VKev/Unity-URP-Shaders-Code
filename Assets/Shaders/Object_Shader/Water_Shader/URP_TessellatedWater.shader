@@ -27,6 +27,10 @@ Shader "MyCustom_URP_Shader/URP_TessellatedWater" {
         _WaterShadow("Shadow Intensity",float) = -0.5
 
         _RefractionCut("Refraction Cut", float) = 1
+
+        _ReflectionMap ("Reflection Map", Cube) = ""
+        _ReflectionIntensity("Reflection Intensity", float) = 0.5
+        _ReflectionNormalIntensity("Reflection Normal Intensity", float) = 0.3
     }
     SubShader{
         Tags{"RenderType" = "Transparent" "Queue" = "Transparent" "RenderPipeline" = "UniversalPipeline" "IgnoreProjector" = "True"}
@@ -68,6 +72,7 @@ Shader "MyCustom_URP_Shader/URP_TessellatedWater" {
 
             struct TessellationControlPoint {
                 float3 positionWS : INTERNALTESSPOS;
+                float3 inverseNormalDir: TEXCOORD4;
                 float3 normalWS : NORMAL;
                 float3 tangentWS:TANGENT;
                 float3 biTangent: TEXCOORD1;
@@ -94,9 +99,13 @@ Shader "MyCustom_URP_Shader/URP_TessellatedWater" {
                 float3 tangentWS : TEXCOORD3;
                 float3 biTangent : TEXCOORD2;
                 float3 positionWS: TEXCOORD4;
+                float3 inverseNormalDir: TEXCOORD7;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
+            float4x4 _Object2World;
+            
             sampler2D _CameraOpaqueTexture;
+            float4x4 _World2Object;
             CBUFFER_START(UnityPerMaterial)
                 float3 _FactorEdge1;
                 float _FactorInside;
@@ -123,7 +132,10 @@ Shader "MyCustom_URP_Shader/URP_TessellatedWater" {
                 float _InteractFactorInside;
                 float _InteractTessellatedRange;
                 float _RefractionCut;
+                float _ReflectionIntensity;
+                float _ReflectionNormalIntensity;
                 float4 _PlayerWpos;
+                uniform samplerCUBE _ReflectionMap;
             CBUFFER_END
 
             float3 GetViewDirectionFromPosition(float3 positionWS) {
@@ -155,16 +167,16 @@ Shader "MyCustom_URP_Shader/URP_TessellatedWater" {
                               * (input.tangentOS.w) 
                               * (unity_WorldTransformParams.w);
                 
+                output.inverseNormalDir = mul (input.normalOS, _World2Object);
                 output.positionWS = posnInputs.positionWS;
                 output.screenPosition = ComputeScreenPos(TransformObjectToHClip(input.positionOS.xyz));
                 return output;
             }
 
             // The patch constant function runs once per triangle, or "patch"
-            // It runs in parallel to the hull function
             TessellationFactors PatchConstantFunction(
                 InputPatch<TessellationControlPoint, 3> patch) {
-                UNITY_SETUP_INSTANCE_ID(patch[0]); // Set up instancing
+                UNITY_SETUP_INSTANCE_ID(patch[0]); 
 
                 float distance1 = distance(_PlayerWpos.xyz, patch[0].positionWS);
                 float distance2 = distance(_PlayerWpos.xyz, patch[1].positionWS);
@@ -190,15 +202,14 @@ Shader "MyCustom_URP_Shader/URP_TessellatedWater" {
             }
 
             // The hull function runs once per vertex. You can use it to modify vertex
-            // data based on values in the entire triangle
             [domain("tri")] // Signal we're inputting triangles
             [outputcontrolpoints(3)] // Triangles have three points
             [outputtopology("triangle_cw")] // Signal we're outputting triangles
             [patchconstantfunc("PatchConstantFunction")] // Register the patch constant function
              [partitioning("integer")]
             TessellationControlPoint Hull(
-                InputPatch<TessellationControlPoint, 3> patch, // Input triangle
-                uint id : SV_OutputControlPointID) { // Vertex index on the triangle
+                InputPatch<TessellationControlPoint, 3> patch, 
+                uint id : SV_OutputControlPointID) { 
 
                 return patch[id];
             }
@@ -210,22 +221,21 @@ Shader "MyCustom_URP_Shader/URP_TessellatedWater" {
 		            patch[2].fieldName * barycentricCoordinates.z
 
             // The domain function runs once per vertex in the final, tessellated mesh
-            // Use it to reposition vertices and prepare for the fragment stage
-            [domain("tri")] // Signal we're inputting triangles
+            [domain("tri")] 
             domaOut Domain(
-                TessellationFactors factors, // The output of the patch constant function
-                OutputPatch<TessellationControlPoint, 3> patch, // The Input triangle
-                float3 barycentricCoordinates : SV_DomainLocation) { // The barycentric coordinates of the vertex on the triangle
+                TessellationFactors factors, 
+                OutputPatch<TessellationControlPoint, 3> patch, 
+                float3 barycentricCoordinates : SV_DomainLocation) { 
 
                 domaOut output;
 
-                // Setup instancing and stereo support (for VR)
                 UNITY_SETUP_INSTANCE_ID(patch[0]);
                 UNITY_TRANSFER_INSTANCE_ID(patch[0], output);
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
 
                 float3 positionWS = BARYCENTRIC_INTERPOLATE(positionWS);
                 float3 normalWS = BARYCENTRIC_INTERPOLATE(normalWS);
+                float3 inverseNormalDir = BARYCENTRIC_INTERPOLATE(inverseNormalDir);
                 float3 tangentWS = BARYCENTRIC_INTERPOLATE(tangentWS);
                 float2 waterUV = BARYCENTRIC_INTERPOLATE(waterUV);
                 float2 foamUV = BARYCENTRIC_INTERPOLATE(foamUV);
@@ -245,7 +255,7 @@ Shader "MyCustom_URP_Shader/URP_TessellatedWater" {
                 output.normalWS = normalWS;
                 output.biTangent = biTangent;
                 output.positionWS = positionWS;
-
+                output.inverseNormalDir = inverseNormalDir;
                 return output;
             }
             float DepthFade (float rawDepth,float strength, float4 screenPosition){
@@ -257,6 +267,7 @@ Shader "MyCustom_URP_Shader/URP_TessellatedWater" {
                 return depthFade;
             }
 
+ 
             float4 Fragment(domaOut i) : SV_Target{
                 UNITY_SETUP_INSTANCE_ID(i);
                 float2 screenSpaceUV = i.screenPosition.xy/i.screenPosition.w;
@@ -286,8 +297,15 @@ Shader "MyCustom_URP_Shader/URP_TessellatedWater" {
                 float noiseRefractionCut = DepthFade(noiseRawDepth,_RefractionCut, gradientNoiseScreenPos) <1 ? 0:1;
 
                 
+                
                 float4 waterDistortionCol = tex2Dproj(_CameraOpaqueTexture,gradientNoiseScreenPos);
                 waterDistortionCol = lerp( tex2Dproj( _CameraOpaqueTexture, i.screenPositionReal ), waterDistortionCol, noiseRefractionCut);
+
+                float3 viewDir = GetWorldSpaceNormalizeViewDir(i.positionWS);
+                float3 normal = _ReflectionNormalIntensity*normalize( gradientNoiseNormal);
+                float3 reflectedDir = reflect( -viewDir, i.inverseNormalDir);
+                float4 reflectionCol = texCUBE(_ReflectionMap, reflectedDir);
+                waterDistortionCol = lerp(waterDistortionCol ,reflectionCol, _ReflectionIntensity );
 
 
                 float foamDepthFade = DepthFade(rawDepth,_FoamAmount, i.screenPosition);
@@ -312,19 +330,20 @@ Shader "MyCustom_URP_Shader/URP_TessellatedWater" {
                 float3 gradientNoiseNormalWS;
                 Unity_NormalFromHeight_World_float(waterGradientNoise,0.1,i.positionWS,tangentMatrix,gradientNoiseNormalWS);
 
-                InputData inputData = (InputData)0;//declare InputData struct
-                inputData.normalWS = gradientNoiseNormalWS;// if front face return 1 else return -1
-                inputData.viewDirectionWS = GetWorldSpaceNormalizeViewDir(i.positionWS);//get view dir base on positionWS
+                InputData inputData = (InputData)0;
+                inputData.normalWS = gradientNoiseNormalWS;
+                inputData.viewDirectionWS = GetWorldSpaceNormalizeViewDir(i.positionWS);
 
                
-                SurfaceData surfaceData = (SurfaceData)0;//declare SurfaceData 
+                SurfaceData surfaceData = (SurfaceData)0;
                 surfaceData.albedo = float3(1,1,1)*_WaterShadow;
                 surfaceData.alpha = 1;
                 surfaceData.specular = _Gloss;
                 surfaceData.smoothness = _Smoothness;
                 
-                //return (RefractionCut*foamCutoff);
-                return finalCol +UniversalFragmentBlinnPhong(inputData , surfaceData)*_SpecularIntensity;
+                finalCol = finalCol + UniversalFragmentBlinnPhong(inputData , surfaceData)*_SpecularIntensity;
+                //return texCUBE(_ReflectionMap, reflectedDir);
+                return finalCol ;
                 //return float4(normalize(input.normalWS),1);
             }
 

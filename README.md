@@ -37,9 +37,9 @@ Free, use any where you like. bBt not for commercial.
 <img src="/ShowCase/Grass1.png" alt="drawing" width="350"/> <img src="/ShowCase/Grass2.png" alt="drawing" width="350"/>
 
 ### Water Shader:
-    -Water distortion
-    -Wave by noise
-    -Foam customizable
-    -Reflection (Updating)
+    -Water distortion.
+    -Wave by noise.
+    -Foam customizable.
+    -Reflection with reflection probe.
 
 <img src="/ShowCase/Water.png" alt="drawing" width="700"/>

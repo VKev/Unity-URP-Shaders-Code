@@ -14,5 +14,6 @@ public class MainCameraPropertyGet : MonoBehaviour
     void Update()
     {
         Shader.SetGlobalMatrix("_CameraViewMatrix", Camera.main.worldToCameraMatrix);
+        
     }
 }
