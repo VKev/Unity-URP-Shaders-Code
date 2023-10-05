@@ -72,7 +72,6 @@ Shader "MyCustom_URP_Shader/URP_TessellatedWater" {
 
             struct TessellationControlPoint {
                 float3 positionWS : INTERNALTESSPOS;
-                float3 inverseNormalDir: TEXCOORD4;
                 float3 normalWS : NORMAL;
                 float3 tangentWS:TANGENT;
                 float3 biTangent: TEXCOORD1;
@@ -99,7 +98,6 @@ Shader "MyCustom_URP_Shader/URP_TessellatedWater" {
                 float3 tangentWS : TEXCOORD3;
                 float3 biTangent : TEXCOORD2;
                 float3 positionWS: TEXCOORD4;
-                float3 inverseNormalDir: TEXCOORD7;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
             float4x4 _Object2World;
@@ -166,8 +164,7 @@ Shader "MyCustom_URP_Shader/URP_TessellatedWater" {
                 output.biTangent = cross(output.normalWS, output.tangentWS)
                               * (input.tangentOS.w) 
                               * (unity_WorldTransformParams.w);
-                
-                output.inverseNormalDir = mul (input.normalOS, _World2Object);
+
                 output.positionWS = posnInputs.positionWS;
                 output.screenPosition = ComputeScreenPos(TransformObjectToHClip(input.positionOS.xyz));
                 return output;
@@ -235,7 +232,6 @@ Shader "MyCustom_URP_Shader/URP_TessellatedWater" {
 
                 float3 positionWS = BARYCENTRIC_INTERPOLATE(positionWS);
                 float3 normalWS = BARYCENTRIC_INTERPOLATE(normalWS);
-                float3 inverseNormalDir = BARYCENTRIC_INTERPOLATE(inverseNormalDir);
                 float3 tangentWS = BARYCENTRIC_INTERPOLATE(tangentWS);
                 float2 waterUV = BARYCENTRIC_INTERPOLATE(waterUV);
                 float2 foamUV = BARYCENTRIC_INTERPOLATE(foamUV);
@@ -255,7 +251,6 @@ Shader "MyCustom_URP_Shader/URP_TessellatedWater" {
                 output.normalWS = normalWS;
                 output.biTangent = biTangent;
                 output.positionWS = positionWS;
-                output.inverseNormalDir = inverseNormalDir;
                 return output;
             }
             float DepthFade (float rawDepth,float strength, float4 screenPosition){
@@ -283,28 +278,44 @@ Shader "MyCustom_URP_Shader/URP_TessellatedWater" {
                 float waterGradientNoise;
                 Unity_GradientNoise_float(i.waterUV, 1, waterGradientNoise);
 
+
+
+
                 float3 gradientNoiseNormal;
                 float3x3 tangentMatrix = float3x3(i.tangentWS, i.biTangent,i.normalWS);
+
                 Unity_NormalFromHeight_Tangent_float(waterGradientNoise, 0.1,i.positionWS,tangentMatrix,gradientNoiseNormal);
                 gradientNoiseNormal *= _NoiseNormalStrength;
-
                 gradientNoiseNormal += i.screenPosition.xyz ;
-
                 float4 gradientNoiseScreenPos = float4(gradientNoiseNormal,i.screenPosition.w );
-
                 float2 noiseScreenSpaceUV = gradientNoiseScreenPos.xy/gradientNoiseScreenPos.w;
                 float noiseRawDepth = SampleSceneDepth(noiseScreenSpaceUV);
                 float noiseRefractionCut = DepthFade(noiseRawDepth,_RefractionCut, gradientNoiseScreenPos) <1 ? 0:1;
 
-                
-                
+
+
+
                 float4 waterDistortionCol = tex2Dproj(_CameraOpaqueTexture,gradientNoiseScreenPos);
                 waterDistortionCol = lerp( tex2Dproj( _CameraOpaqueTexture, i.screenPositionReal ), waterDistortionCol, noiseRefractionCut);
 
+
+
+
+                float3 gradientNoiseNormalWS;
+                Unity_NormalFromHeight_World_float(waterGradientNoise,0.1,i.positionWS,tangentMatrix,gradientNoiseNormalWS);
+
+
+
+
                 float3 viewDir = GetWorldSpaceNormalizeViewDir(i.positionWS);
-                float3 reflectedDir = reflect( -viewDir, i.inverseNormalDir);
+                float3 reflectedDir = reflect( -viewDir, normalize( i.normalWS)*(1-_ReflectionNormalIntensity) +
+                                                normalize( gradientNoiseNormalWS)*_ReflectionNormalIntensity);
                 float4 reflectionCol = texCUBE(_ReflectionMap, reflectedDir);
+
+
+
                 waterDistortionCol = lerp(waterDistortionCol ,reflectionCol, _ReflectionIntensity );
+
 
 
                 float foamDepthFade = DepthFade(rawDepth,_FoamAmount, i.screenPosition);
@@ -319,6 +330,9 @@ Shader "MyCustom_URP_Shader/URP_TessellatedWater" {
                 float4 foamColor = lerp(waterDepthCol, _FoamColor, foamCutoff);
 
 
+
+
+
                 float4 mainTex = tex2D(_MainTex,i.waterUV);
                 float4 finalCol = lerp(waterDistortionCol, foamColor, foamColor.a);
                 finalCol = lerp(mainTex,finalCol,_TextureBlend);
@@ -326,8 +340,8 @@ Shader "MyCustom_URP_Shader/URP_TessellatedWater" {
 
 
 
-                float3 gradientNoiseNormalWS;
-                Unity_NormalFromHeight_World_float(waterGradientNoise,0.1,i.positionWS,tangentMatrix,gradientNoiseNormalWS);
+                //float3 gradientNoiseNormalWS;
+                //Unity_NormalFromHeight_World_float(waterGradientNoise,0.1,i.positionWS,tangentMatrix,gradientNoiseNormalWS);
 
                 InputData inputData = (InputData)0;
                 inputData.normalWS = gradientNoiseNormalWS;

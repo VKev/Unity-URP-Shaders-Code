@@ -139,7 +139,7 @@ Material:
     - _QueueOffset: 0
     - _ReceiveShadows: 1
     - _ReflectionIntensity: 0.3
-    - _ReflectionNormalIntensity: 0.3
+    - _ReflectionNormalIntensity: 0.1
     - _RefractionCut: 0
     - _Smoothness: 1
     - _SmoothnessTextureChannel: 0
