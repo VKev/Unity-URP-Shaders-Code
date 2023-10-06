@@ -4,9 +4,38 @@ Using shader code, Non-shader graph
 Unity 2023.2.0b1
 
 ## License
-Free, use any where you like. bBt not for commercial. 
+Free, use any where you like. but not for commercial. 
 
+## How to use
+#### For Outline post process: 
+    
+    -Add outline render feature to your universal render data
+    -Add outline override to global volume
 
+    Setting:
+    -Outline layer is layers which effected by outline volume
+    -Obstruct layter is layers which obstruct the outline    
+<img src="/ShowCase/OutlineSetting.png" alt="drawing" width="400"/>
+
+#### For Grass shader:
+    
+    -Blend grass color with terrain feature need the texture map of terrain, you can create a render texture that render terrain color or simply use terrain texture map.
+
+    -Blend grass color with terrain feature can be turned off by set the Blend intensity in material inspector to 0
+    
+
+#### For Tessellated water shader:
+
+    -Reflection feature need a reflection cubemap - which you can bake using unity reflection probe.
+
+#### For any shader with interact with player feature:
+
+    -Set shader global property _PlayerWpos to player position in update().
+    
+    -Only work with 1 player.
+    
+
+## Show case
 ### Toon Shader:
     -Color, texture customizable.
     -All light support.
