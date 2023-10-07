@@ -15,7 +15,7 @@ MonoBehaviour:
   active: 1
   outlineSize:
     m_OverrideState: 1
-    m_Value: 2
+    m_Value: 2.65
   outlineColor:
     m_OverrideState: 1
     m_Value: {r: 1, g: 1, b: 1, a: 1}

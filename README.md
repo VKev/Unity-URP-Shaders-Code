@@ -7,14 +7,17 @@ Unity 2023.2.0b1
 Free, use any where you like. but not for commercial. 
 
 ## How to use
+#### For all shader:
+    -Download and copy the VkevShaderLib.hlsl file in your assets folder (Impotant)
+    -The directory of the VkevShaderLib should be assets/VkevShaderLib.hlsl
+
+
 #### For Outline post process: 
     
     -Add outline render feature to your universal render data
+    
     -Add outline override to global volume
-
-    Setting:
-    -Outline layer is layers which effected by outline volume
-    -Obstruct layter is layers which obstruct the outline    
+ 
 <img src="/ShowCase/OutlineSetting.png" alt="drawing" width="400"/>
 
 #### For Grass shader:
