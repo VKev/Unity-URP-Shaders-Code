@@ -35,11 +35,18 @@
                 float _WaveLocalSpeed,_WaveLocalStrength;
                 float _Randomize,_RandomLocalLength;
                 float4 _WaveLocalDir;
+                
 
 
                 float _WaveWorldSpeed,_WaveWorldStrength;
                 float _RandomWorldLength;
+                float _WindTextureScale;
+                float _WindTextureStrength;
+                float _WindTextureSpeed;
                 float4 _WaveWorldDir;
+                sampler2D _WindTexture;
+                float4 _WindTexture_ST;
+
 
 
                 float _Gloss;
@@ -82,9 +89,18 @@
                     float3 wPos = GetVertexPositionInputs(v.positionOS.xyz).positionWS;
                     float random = Random(wPos,_Randomize) ;
 
+                    
                     v.positionOS.xz += WindHorizontalOS(v.uv, random, _WaveLocalSpeed,_WaveLocalStrength,_WaveLocalDir).xz;
 
+                    
+
                     float3 finalPositionWS = GetVertexPositionInputs(v.positionOS.xyz).positionWS;
+
+                    _WindTexture_ST.zw += _Time.y*_WindTextureSpeed;
+                    float2 positionWSUV = o.positionWS.xz*_WindTextureScale;
+                    float2 windTextureUV  = TRANSFORM_TEX( positionWSUV, _WindTexture);
+                    float windTexture = tex2Dlod(_WindTexture, float4(windTextureUV,0,0)).x;
+                    finalPositionWS.xz += windTexture*_WindTextureStrength*v.uv.y;
 
                     finalPositionWS.xz -=  directionToPlayer.xz*distanceToPlayer*o.uv.y*_InteractStrength;
                     finalPositionWS.y -=  directionToPlayer.y*distanceToPlayer*o.uv.y*1;

@@ -34,6 +34,7 @@
                 float3 tangentWS : TEXCOORD3;
                 float3 biTangent : TEXCOORD2;
                 float3 positionWS: TEXCOORD4;
+                float distanceToCam: TEXCOORD7;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
             float4x4 _Object2World;

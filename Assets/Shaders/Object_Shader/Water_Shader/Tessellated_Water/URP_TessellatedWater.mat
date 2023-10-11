@@ -113,7 +113,7 @@ Material:
     - _ClearCoatSmoothness: 0
     - _Cull: 2
     - _Cutoff: 0.5
-    - _Depth: 10
+    - _Depth: 20
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
@@ -159,11 +159,11 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _BottomColor: {r: 0, g: 0.18381505, b: 0.4811321, a: 1}
+    - _BottomColor: {r: 0, g: 0.18381494, b: 0.4811321, a: 0.64705884}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _FactorEdge1: {r: 3, g: 3, b: 3, a: 0}
-    - _FoamColor: {r: 1, g: 1, b: 1, a: 0.44705883}
+    - _FoamColor: {r: 1, g: 1, b: 1, a: 0.5764706}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _SurfaceColor: {r: 0.38113183, g: 0.9399606, b: 1, a: 0.23921569}
   m_BuildTextureStacks: []

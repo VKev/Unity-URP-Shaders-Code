@@ -3,7 +3,9 @@ guid: 274355a310ddb4646aaf51817f526b02
 ShaderImporter:
   externalObjects: {}
   defaultTextures:
-  - _TerrainHeightMap: {instanceID: 0}
+  - _MainTex: {instanceID: 0}
+  - _WindTexture: {instanceID: 0}
+  - _TerrainMap: {instanceID: 0}
   nonModifiableTextures: []
   userData: 
   assetBundleName: 

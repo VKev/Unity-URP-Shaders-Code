@@ -66,7 +66,6 @@ Free, use any where you like. but not for commercial.
     -Interactive grass.
     -Wind Local/world direction, randomize wind or sync wind.
     -All light support.
-    -Can change grass model to flower model, will work fine.
     -Color, texture customizable.
    >**Optimization**: GPU instancing, Occlusion culling, Frustum culling, LOD.
    

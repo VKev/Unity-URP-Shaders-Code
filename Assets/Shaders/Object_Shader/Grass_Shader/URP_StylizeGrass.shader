@@ -17,6 +17,10 @@ Shader "MyCustom_URP_Shader/URP_StylizeGrass"
         _WaveLocalDir("Local wind direction", vector) = (0.7,0.7,0,0)
 
         [Header(World animation options)]
+        _WindTexture("Wind texture", 2D) = "bump"{}
+        _WindTextureScale("Wind Texture Scale", float) = 0.01
+        _WindTextureStrength("Wind Texture Strength", float) = 0.1
+        _WindTextureSpeed("Wind Texture Speed", float) = 1
         _WaveWorldSpeed("World wave speed",float) = 0.3
         _WaveWorldStrength("World wind strength", float) = 0.05
         _WaveWorldDir("World wind direction", vector) = (1,0,0,0)

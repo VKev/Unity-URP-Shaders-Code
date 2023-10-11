@@ -38,6 +38,7 @@
                 output.normalWS = normalWS;
                 output.biTangent = biTangent;
                 output.positionWS = positionWS;
+                output.distanceToCam = _WorldSpaceCameraPos.y - positionWS.y;
                 return output;
             }
 
@@ -54,14 +55,19 @@
  
             float4 Fragment(domaOut i) : SV_Target{
                 UNITY_SETUP_INSTANCE_ID(i);
-                float2 screenSpaceUV = i.screenPosition.xy/i.screenPosition.w;
-                
-                float rawDepth = SampleSceneDepth(screenSpaceUV);
-                float depthFade = DepthFade(rawDepth,_Depth, i.screenPosition);
-                float RefractionCut = depthFade <=0 ? 0:1;
-                float4 waterDepthCol = lerp(_BottomColor,_SurfaceColor,(1-depthFade));
-                
+                float2 screenSpaceUV = i.screenPositionReal.xy/i.screenPositionReal.w;
 
+                float rawDepth;
+                float depthFade;
+                if(i.distanceToCam >=0){
+                    rawDepth = SampleSceneDepth(screenSpaceUV);
+                    depthFade = DepthFade(rawDepth,_Depth, i.screenPositionReal);
+                }else{
+                    rawDepth = 1- SampleSceneDepth(screenSpaceUV);
+                    depthFade = DepthFade(rawDepth,1-_Depth, i.screenPositionReal);
+                }
+
+                float4 waterDepthCol = lerp(_BottomColor,_SurfaceColor,(1-depthFade));
 
 
                 float waterGradientNoise;
@@ -86,6 +92,7 @@
 
                 float4 waterDistortionCol = tex2Dproj(_CameraOpaqueTexture,gradientNoiseScreenPos);
                 waterDistortionCol = lerp( tex2Dproj( _CameraOpaqueTexture, i.screenPositionReal ), waterDistortionCol, noiseRefractionCut);
+                
 
 
 
@@ -106,17 +113,23 @@
                 waterDistortionCol = lerp(waterDistortionCol ,reflectionCol, _ReflectionIntensity );
 
 
-
-                float foamDepthFade = DepthFade(rawDepth,_FoamAmount, i.screenPosition);
+                float foamDepthFade;
+                if(i.distanceToCam >=0){
+                    foamDepthFade = DepthFade(rawDepth,_FoamAmount, i.screenPosition);
+                }else{
+                    foamDepthFade = DepthFade(1-rawDepth,_FoamAmount, i.screenPosition);
+                }
+                float foamRefractionCut = foamDepthFade <=0? 0:1;
                 foamDepthFade *= _FoamCutoff;
 
                 float foamGradientNoise;
                 Unity_GradientNoise_float(i.foamUV, 1, foamGradientNoise);
 
                 float foamCutoff = step(foamDepthFade, foamGradientNoise);
-                foamCutoff *= _FoamColor.a*RefractionCut;
+                foamCutoff *= _FoamColor.a*foamRefractionCut;
                 
                 float4 foamColor = lerp(waterDepthCol, _FoamColor, foamCutoff);
+               
 
 
 
@@ -142,9 +155,10 @@
                 surfaceData.alpha = 1;
                 surfaceData.specular = _Gloss;
                 surfaceData.smoothness = _Smoothness;
-                
+               
+
                 finalCol = finalCol + UniversalFragmentBlinnPhong(inputData , surfaceData)*_SpecularIntensity;
                 //return texCUBE(_ReflectionMap, reflectedDir);
-                return finalCol ;
+                return (finalCol) ;
                 //return float4(normalize(input.normalWS),1);
             }
