@@ -29,6 +29,8 @@ public class OutlineBlitPass : ScriptableRenderPass
 
             cmd.GetTemporaryRT(tempID, cameraTextureDescriptor);
             tempRT = RTHandles.Alloc(new RenderTargetIdentifier(tempID));
+
+
             ConfigureTarget(source);
         }
 
@@ -72,6 +74,6 @@ public class OutlineBlitPass : ScriptableRenderPass
         {
             cmd.ReleaseTemporaryRT(tempID);
             tempRT.Release();
-        }
+    }
 
 }

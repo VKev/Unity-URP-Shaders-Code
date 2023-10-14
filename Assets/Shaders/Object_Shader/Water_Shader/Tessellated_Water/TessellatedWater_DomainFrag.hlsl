@@ -38,7 +38,7 @@
                 output.normalWS = normalWS;
                 output.biTangent = biTangent;
                 output.positionWS = positionWS;
-                output.distanceToCam = _WorldSpaceCameraPos.y - positionWS.y;
+                output.distanceToCam = dot(normalWS,  _WorldSpaceCameraPos - positionWS) >0? length( _WorldSpaceCameraPos - positionWS):  -length( _WorldSpaceCameraPos - positionWS) ;
                 return output;
             }
 
@@ -57,17 +57,15 @@
                 UNITY_SETUP_INSTANCE_ID(i);
                 float2 screenSpaceUV = i.screenPositionReal.xy/i.screenPositionReal.w;
 
-                float rawDepth;
+                float rawDepth = SampleSceneDepth(screenSpaceUV);
                 float depthFade;
                 if(i.distanceToCam >=0){
-                    rawDepth = SampleSceneDepth(screenSpaceUV);
                     depthFade = DepthFade(rawDepth,_Depth, i.screenPositionReal);
                 }else{
-                    rawDepth = 1- SampleSceneDepth(screenSpaceUV);
-                    depthFade = DepthFade(rawDepth,1-_Depth, i.screenPositionReal);
+                    rawDepth = 1- rawDepth;
+                    depthFade = DepthFade(rawDepth,-_Depth, i.screenPositionReal);
                 }
-
-                float4 waterDepthCol = lerp(_BottomColor,_SurfaceColor,(1-depthFade));
+                float4 normalWaterDepthCol = lerp(_BottomColor,_SurfaceColor, (1 - depthFade));
 
 
                 float waterGradientNoise;
@@ -87,7 +85,15 @@
                 float noiseRawDepth = SampleSceneDepth(noiseScreenSpaceUV);
                 float noiseRefractionCut = DepthFade(noiseRawDepth,_RefractionCut, gradientNoiseScreenPos) <1 ? 0:1;
 
-
+                float noiseRefractionDepthFade;
+                if(i.distanceToCam >=0){
+                    noiseRefractionDepthFade = DepthFade(noiseRawDepth,_Depth, gradientNoiseScreenPos);
+                }else{
+                    noiseRawDepth = 1-noiseRawDepth;
+                    noiseRefractionDepthFade = DepthFade(noiseRawDepth,-_Depth, gradientNoiseScreenPos) ;
+                }
+                float4 waterDepthCol = lerp(_BottomColor,_SurfaceColor, (1 - noiseRefractionDepthFade));
+                waterDepthCol = lerp( normalWaterDepthCol, waterDepthCol, noiseRefractionCut);
 
 
                 float4 waterDistortionCol = tex2Dproj(_CameraOpaqueTexture,gradientNoiseScreenPos);

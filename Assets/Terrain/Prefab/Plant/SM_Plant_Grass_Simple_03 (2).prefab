@@ -66,7 +66,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 9bcb5165405a9d74680703037fe264d6, type: 3}
       propertyPath: m_StaticEditorFlags
-      value: 2147483647
+      value: 63
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -95,7 +95,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Gloss: 1
   Color: {r: 0.83137256, g: 0.6837226, b: 0.43529412, a: 0.003921569}
-  AmbientColor: {r: 0.65882355, g: 0.65882355, b: 0.65882355, a: 0.003921569}
+  AmbientColor: {r: 0.9056604, g: 0.9056604, b: 0.9056604, a: 0.003921569}
   RimSize: 1
   RimBlur: 0.1
   RimThreshold: 2
