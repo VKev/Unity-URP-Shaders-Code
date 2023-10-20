@@ -27,7 +27,7 @@
                 
                 float waterGradientNoise;
                 Unity_GradientNoise_float(waterUV, 1, waterGradientNoise);
-                positionWS.y += _WaveStrength*(2*waterGradientNoise-1);
+                positionWS += _WaveStrength*(2*waterGradientNoise-1)*normalWS;
 
                 output.waterUV = waterUV;
                 output.foamUV = foamUV;
@@ -80,10 +80,12 @@
                 Unity_NormalFromHeight_Tangent_float(waterGradientNoise, 0.1,i.positionWS,tangentMatrix,gradientNoiseNormal);
                 gradientNoiseNormal *= _NoiseNormalStrength;
                 gradientNoiseNormal += i.screenPosition.xyz ;
-                float4 gradientNoiseScreenPos = float4(gradientNoiseNormal,i.screenPosition.w );
+                float4 gradientNoiseScreenPos = float4(gradientNoiseNormal,i.screenPosition.w);
                 float2 noiseScreenSpaceUV = gradientNoiseScreenPos.xy/gradientNoiseScreenPos.w;
                 float noiseRawDepth = SampleSceneDepth(noiseScreenSpaceUV);
                 float noiseRefractionCut = DepthFade(noiseRawDepth,_RefractionCut, gradientNoiseScreenPos) <1 ? 0:1;
+
+
 
                 float noiseRefractionDepthFade;
                 if(i.distanceToCam >=0){
@@ -97,7 +99,7 @@
 
 
                 float4 waterDistortionCol = tex2Dproj(_CameraOpaqueTexture,gradientNoiseScreenPos);
-                waterDistortionCol = lerp( tex2Dproj( _CameraOpaqueTexture, i.screenPositionReal ), waterDistortionCol, noiseRefractionCut);
+                waterDistortionCol = lerp( tex2Dproj( _CameraOpaqueTexture, i.screenPositionReal  ), waterDistortionCol, noiseRefractionCut);
                 
 
 
@@ -132,9 +134,10 @@
                 Unity_GradientNoise_float(i.foamUV, 1, foamGradientNoise);
 
                 float foamCutoff = step(foamDepthFade, foamGradientNoise);
-                foamCutoff *= _FoamColor.a*foamRefractionCut;
+                foamCutoff *= _FoamColor.a;
                 
                 float4 foamColor = lerp(waterDepthCol, _FoamColor, foamCutoff);
+                foamColor = lerp(float4(_BottomColor.xyz,0.3), foamColor, foamRefractionCut);
                
 
 
