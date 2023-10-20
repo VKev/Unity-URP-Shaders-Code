@@ -137,7 +137,7 @@
                 foamCutoff *= _FoamColor.a;
                 
                 float4 foamColor = lerp(waterDepthCol, _FoamColor, foamCutoff);
-                foamColor = lerp(float4(_BottomColor.xyz,0.3), foamColor, foamRefractionCut);
+                foamColor = lerp(float4(_BottomColor.xyz,0.3)*normalWaterDepthCol, foamColor, foamRefractionCut);
                
 
 
