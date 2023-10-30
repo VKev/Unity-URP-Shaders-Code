@@ -121,6 +121,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Gloss: 2
+  Color: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.003921569}
   AmbientColor: {r: 0.9245283, g: 0.9245283, b: 0.9245283, a: 0.003921569}
   RimSize: 1
   RimBlur: 0.1
@@ -165,6 +166,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Gloss: 2
+  Color: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.003921569}
   AmbientColor: {r: 0.9245283, g: 0.9245283, b: 0.9245283, a: 0.003921569}
   RimSize: 1
   RimBlur: 0.1
@@ -209,6 +211,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Gloss: 2
+  Color: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.003921569}
   AmbientColor: {r: 0.9245283, g: 0.9245283, b: 0.9245283, a: 0.003921569}
   RimSize: 1
   RimBlur: 0.1

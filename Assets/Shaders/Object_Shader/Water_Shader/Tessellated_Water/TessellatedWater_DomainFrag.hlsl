@@ -137,7 +137,7 @@
                 foamCutoff *= _FoamColor.a;
                 
                 float4 foamColor = lerp(waterDepthCol, _FoamColor, foamCutoff);
-                foamColor = lerp(float4(_BottomColor.xyz,0.3)*normalWaterDepthCol, foamColor, foamRefractionCut);
+                foamColor = lerp(float4(_BottomColor.xyz,0.5)*waterDepthCol, foamColor, foamRefractionCut); 
                
 
 
@@ -168,6 +168,6 @@
 
                 finalCol = finalCol + UniversalFragmentBlinnPhong(inputData , surfaceData)*_SpecularIntensity;
                 //return texCUBE(_ReflectionMap, reflectedDir);
-                return (finalCol) ;
+                return ( finalCol) ;
                 //return float4(normalize(input.normalWS),1);
             }
