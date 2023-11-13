@@ -4,7 +4,7 @@ Shader "MyCustom_URP_Shader/URP_WindToon"
     {
         [Header(Rendering options)]
         _AnimationRenderDistance("Animation render distance", float) = 60
-        _AnimationShadowRenderDistance("Animation render distance", float) = 20
+        _AnimationShadowRenderDistance("Shadow render distance", float) = 20
 
         [Header(Color options)]
         _MainTex ("Texture", 2D) = "white" {}
@@ -45,7 +45,6 @@ Shader "MyCustom_URP_Shader/URP_WindToon"
         _InteractStrength("Interact grass strength",float) = 5
         _InteractOffsetY("Interact offset Y", float) = 0.5
 
-        [HideInInspector] _RenderingPath("Rendering Path", float) = 0
         [HideInInspector] _Pass("Pass", float) = 0
     }
     SubShader

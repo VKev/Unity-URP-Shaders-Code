@@ -17,7 +17,6 @@ Shader "MyCustom_URP_Shader/URP_Toon"
         _RimBlur("Rim Blur", Range(0,0.1))= 0.01
         _RimThreshold("Rim Threshold", Range(0.01,10))= 2
 
-        [HideInInspector] _RenderingPath("Rendering Path", float) = 0
         [HideInInspector] _Pass("Pass", float) = 0
 
     }

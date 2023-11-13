@@ -45,7 +45,6 @@
         _InteractDistance("Interact with grass distance", float) = 1
         _InteractStrength("Interact grass strength",float) = 5
 
-        [HideInInspector] _RenderingPath("Rendering Path", float) = 0
     }
     SubShader
     {
@@ -82,5 +81,4 @@
             ENDHLSL
         }
     }
-    CustomEditor "URP_StylizedGrass_Editor"
 }
