@@ -35,6 +35,9 @@ Material:
     - _MainLightIntensity: 1
     - _MainLightShadowIntensity: 0.4
     - _Metalness: 1
+    - _ObjectType: 1
+    - _Pass: 0
+    - _RenderingPath: 0
     - _RimBlur: 0.01
     - _RimSize: 0.2
     - _RimThreshold: 2
@@ -46,5 +49,6 @@ Material:
     m_Colors:
     - _AmbientColor: {r: 1, g: 1, b: 1, a: 0}
     - _BaseColor: {r: 0.6792453, g: 0.6792453, b: 0.6792453, a: 1}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

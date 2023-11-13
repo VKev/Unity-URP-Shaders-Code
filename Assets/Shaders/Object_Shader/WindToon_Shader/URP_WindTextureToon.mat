@@ -41,8 +41,10 @@ Material:
     - _InteractStrength: 0.15
     - _LightMaxIntensity: 0.5
     - _MainLightShadowIntensity: 1
+    - _Pass: 0
     - _PivotY: 0
     - _Randomize: 1
+    - _RenderingPath: 0
     - _RimBlur: 0.01
     - _RimSize: 0.2
     - _RimThreshold: 2

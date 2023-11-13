@@ -136,8 +136,8 @@
                 float distanceToCamera = length(_WorldSpaceCameraPos - i.positionWS);
                 
 
-                InputData inputdata = (InputData)0;
-                float4 shadowMask = CalculateShadowMask(inputdata);
+                InputData inputData = (InputData)0;
+                float4 shadowMask = CalculateShadowMask(inputData);
                 float4 shadowcoord = TransformWorldToShadowCoord(i.positionWS);
 
 
@@ -170,11 +170,16 @@
                 lightingData.mainLightColor  += baseColor;
 
                 if(distanceToCamera < _AnimationRenderDistance){
+                
                 #if defined(_ADDITIONAL_LIGHTS)
-                    uint pixelLightCount = GetAdditionalLightsCount();
-                    for (uint lightIndex = 0; lightIndex < pixelLightCount; lightIndex++)
-                    {
-                        Light AddLight = GetAdditionalLight(lightIndex,i.positionWS,shadowMask);
+                uint pixelLightCount = GetAdditionalLightsCount();
+
+                #if USE_FORWARD_PLUS
+                for (uint lightIndex = 0; lightIndex < min(URP_FP_DIRECTIONAL_LIGHTS_COUNT, MAX_VISIBLE_LIGHTS); lightIndex++)
+                {
+                    FORWARD_PLUS_SUBTRACTIVE_LIGHT_CHECK
+
+                    Light AddLight = GetAdditionalLight(lightIndex,i.positionWS,shadowMask);
 
 
                         float3 addSpecularLight = SpecularLight(i.normalWS,i.positionWS,1-_Gloss,AddLight);
@@ -195,11 +200,34 @@
 
 
                         lightingData.additionalLightsColor += additionalColor;
-                        
-                    }
+                }
+                #endif
+
+                LIGHT_LOOP_BEGIN(pixelLightCount)
+                    Light AddLight = GetAdditionalLight(lightIndex,i.positionWS,shadowMask);
+
+
+                        float3 addSpecularLight = SpecularLight(i.normalWS,i.positionWS,1-_Gloss,AddLight);
+                        addSpecularLight = clamp(addSpecularLight,_DarkThreshold,1) *_Luminosity;
+
+
+                        float3 additionalColor = gradientColor.rgb
+                                                * AddLight.color
+                                                * AddLight.shadowAttenuation 
+                                                * addSpecularLight
+                                                * min(AddLight.distanceAttenuation,_MinAdditionalLightIntensity);
+
+                        if(mainLight.shadowAttenuation <= 0.1){
+                            additionalColor += _NightTimeAmbientColor.rgb*gradientColor.rgb;
+                        }
+                        else
+                            additionalColor += _DayTimeAmbientColor.rgb* gradientColor.rgb;
+
+
+                        lightingData.additionalLightsColor += additionalColor;
+                LIGHT_LOOP_END
                 #endif
                 }
-
 
 
                 

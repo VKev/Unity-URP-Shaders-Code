@@ -65,10 +65,12 @@ Material:
     - _MinAdditionalLightIntensity: 1
     - _MinMainLightIntensity: 1
     - _NightAmbientThreshold: 0.5
+    - _Pass: 0
     - _RandomLength: 0.25
     - _RandomLocalLength: 0.2
     - _RandomWorldLength: 0.25
     - _Randomize: 1
+    - _RenderingPath: 0
     - _ShadowIntensity: 1
     - _TerrainMaxHeight: 200
     - _TerranID: 1567

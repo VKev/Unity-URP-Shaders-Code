@@ -17,6 +17,9 @@ Shader "MyCustom_URP_Shader/URP_Toon"
         _RimBlur("Rim Blur", Range(0,0.1))= 0.01
         _RimThreshold("Rim Threshold", Range(0.01,10))= 2
 
+        [HideInInspector] _RenderingPath("Rendering Path", float) = 0
+        [HideInInspector] _Pass("Pass", float) = 0
+
     }
     SubShader
     {
@@ -27,7 +30,11 @@ Shader "MyCustom_URP_Shader/URP_Toon"
 
         Pass
         {
-            
+            Name "ForwardLit"
+            Tags
+            {
+                "LightMode" = "UniversalForward"
+            }
             HLSLPROGRAM
 
             #pragma vertex vert
@@ -45,6 +52,7 @@ Shader "MyCustom_URP_Shader/URP_Toon"
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
             #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
             #define ADDITIONAL_LIGHT_CALCULATE_SHADOWS
+            #pragma multi_compile _ _FORWARD_PLUS
 
             //#define USE_STRUCTURED_BUFFER_FOR_LIGHT_DATA
 
@@ -77,4 +85,5 @@ Shader "MyCustom_URP_Shader/URP_Toon"
             ENDHLSL
         }
     }
+    CustomEditor "URP_Global_Editor"
 }

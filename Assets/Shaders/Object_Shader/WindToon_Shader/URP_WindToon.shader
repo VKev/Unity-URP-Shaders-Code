@@ -44,6 +44,9 @@ Shader "MyCustom_URP_Shader/URP_WindToon"
         _InteractDistance("Interact with grass distance", float) = 1
         _InteractStrength("Interact grass strength",float) = 5
         _InteractOffsetY("Interact offset Y", float) = 0.5
+
+        [HideInInspector] _RenderingPath("Rendering Path", float) = 0
+        [HideInInspector] _Pass("Pass", float) = 0
     }
     SubShader
     {
@@ -73,6 +76,7 @@ Shader "MyCustom_URP_Shader/URP_WindToon"
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
             #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
             #define ADDITIONAL_LIGHT_CALCULATE_SHADOWS
+            #pragma multi_compile _ _FORWARD_PLUS
 
             //#define USE_STRUCTURED_BUFFER_FOR_LIGHT_DATA
 
@@ -242,8 +246,8 @@ Shader "MyCustom_URP_Shader/URP_WindToon"
                 float3 V = GetWorldSpaceNormalizeViewDir(wPos);
 
 
-                InputData inputdata = (InputData)0;
-                float4 shadowMask = CalculateShadowMask(inputdata);
+                InputData inputData = (InputData)0;
+                float4 shadowMask = CalculateShadowMask(inputData);
 
                 
                 float4 shadowcoord = TransformWorldToShadowCoord(wPos);
@@ -260,15 +264,24 @@ Shader "MyCustom_URP_Shader/URP_WindToon"
                 lightingData.mainLightColor  += baseColor;
 
                 #if defined(_ADDITIONAL_LIGHTS)
-                    uint pixelLightCount = GetAdditionalLightsCount();
-                    for (uint lightIndex = 0; lightIndex < pixelLightCount; lightIndex++)
-                    {
-                        Light AddLight = GetAdditionalLight(lightIndex,wPos,shadowMask);
-                        
-                        float3 additionalColor = Col.rgb*mainTex.xyz*generateToonLightBlinnPhong(N,wPos,V,AddLight,ambientColor,gloss,rimSize,rimBlur,rimThreshold);
-                        lightingData.additionalLightsColor += additionalColor;
-                        
-                    }
+                uint pixelLightCount = GetAdditionalLightsCount();
+
+                #if USE_FORWARD_PLUS
+                for (uint lightIndex = 0; lightIndex < min(URP_FP_DIRECTIONAL_LIGHTS_COUNT, MAX_VISIBLE_LIGHTS); lightIndex++)
+                {
+                    FORWARD_PLUS_SUBTRACTIVE_LIGHT_CHECK
+
+                    Light AddLight = GetAdditionalLight(lightIndex, wPos, shadowMask);
+                    float3 additionalColor = Col.rgb*mainTex.xyz*generateToonLightBlinnPhong(N,wPos,V,mainLight,ambientColor,gloss,rimSize,rimBlur,rimThreshold);
+                    lightingData.additionalLightsColor += additionalColor;
+                }
+                #endif
+
+                LIGHT_LOOP_BEGIN(pixelLightCount)
+                    Light AddLight = GetAdditionalLight(lightIndex, wPos, shadowMask);
+                    float3 additionalColor = Col.rgb*mainTex.xyz*generateToonLightBlinnPhong(N,wPos,V,mainLight,ambientColor,gloss,rimSize,rimBlur,rimThreshold);
+                    lightingData.additionalLightsColor += additionalColor;
+                LIGHT_LOOP_END
                 #endif
                 
 
@@ -406,4 +419,5 @@ Shader "MyCustom_URP_Shader/URP_WindToon"
             ENDHLSL
         }
     }
+    CustomEditor "URP_Global_Editor"
 }

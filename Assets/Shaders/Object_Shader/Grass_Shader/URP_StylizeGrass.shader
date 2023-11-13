@@ -45,6 +45,7 @@
         _InteractDistance("Interact with grass distance", float) = 1
         _InteractStrength("Interact grass strength",float) = 5
 
+        [HideInInspector] _RenderingPath("Rendering Path", float) = 0
     }
     SubShader
     {
@@ -67,7 +68,7 @@
 
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
             #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
-
+            #pragma multi_compile _ _FORWARD_PLUS
 
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
@@ -81,4 +82,5 @@
             ENDHLSL
         }
     }
+    CustomEditor "URP_StylizedGrass_Editor"
 }

@@ -79,7 +79,7 @@
 
                 return Col;
             };
-
+            
             //float3 _LightDirection;
             half4 frag(vertOut i, FRONT_FACE_TYPE frontFace : FRONT_FACE_SEMANTIC) : SV_Target//get front face of object
             {
@@ -98,8 +98,8 @@
                 float3 V = GetWorldSpaceNormalizeViewDir(wPos);
 
 
-                InputData inputdata = (InputData)0;
-                float4 shadowMask = CalculateShadowMask(inputdata);
+                InputData inputData = (InputData)0;
+                float4 shadowMask = CalculateShadowMask(inputData);
 
                 
                 float4 shadowcoord = TransformWorldToShadowCoord(wPos);
@@ -114,21 +114,35 @@
 
                 LightingData lightingData = (LightingData)0;
                 lightingData.mainLightColor  += baseColor;
-
+                
                 #if defined(_ADDITIONAL_LIGHTS)
-                    uint pixelLightCount = GetAdditionalLightsCount();
-                    for (uint lightIndex = 0; lightIndex < pixelLightCount; lightIndex++)
-                    {
-                        Light AddLight = GetAdditionalLight(lightIndex,wPos,shadowMask);
-                        
-                        float3 additionalColor = Col.rgb*mainTex.xyz*generateToonLightBlinnPhong(N,wPos,V,AddLight,ambientColor,gloss,rimSize,rimBlur,rimThreshold);
-                        lightingData.additionalLightsColor += additionalColor;
-                        
-                    }
+                uint pixelLightCount = GetAdditionalLightsCount();
+
+                #if USE_FORWARD_PLUS
+                for (uint lightIndex = 0; lightIndex < min(URP_FP_DIRECTIONAL_LIGHTS_COUNT, MAX_VISIBLE_LIGHTS); lightIndex++)
+                {
+                    FORWARD_PLUS_SUBTRACTIVE_LIGHT_CHECK
+
+                    Light AddLight = GetAdditionalLight(lightIndex, wPos, shadowMask);
+                    float3 additionalColor = Col.rgb*mainTex.xyz*generateToonLightBlinnPhong(N,wPos,V,AddLight,ambientColor,gloss,rimSize,rimBlur,rimThreshold);
+                    lightingData.additionalLightsColor += additionalColor;
+                }
                 #endif
+
+                LIGHT_LOOP_BEGIN(pixelLightCount)
+                    Light AddLight = GetAdditionalLight(lightIndex, wPos, shadowMask);
+                    float3 additionalColor = Col.rgb*mainTex.xyz*generateToonLightBlinnPhong(N,wPos,V,AddLight,ambientColor,gloss,rimSize,rimBlur,rimThreshold);
+                    lightingData.additionalLightsColor += additionalColor;
+                LIGHT_LOOP_END
+                #endif
+                        //Light AddLight = GetAdditionalLight(lightIndex,wPos,shadowMask);
+                        
+                        ///float3 additionalColor = Col.rgb*mainTex.xyz*generateToonLightBlinnPhong(N,wPos,V,AddLight,ambientColor,gloss,rimSize,rimBlur,rimThreshold);
+                        //lightingData.additionalLightsColor += additionalColor;
+
                 
 
 
-                //return float4(additionalColor,1) ;
+                //return float4(test,1) ;
                 return CalculateFinalColor(lightingData,1);
             }
