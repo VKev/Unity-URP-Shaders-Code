@@ -149,7 +149,9 @@
                 mainSpecularLight = clamp(mainSpecularLight,_DarkThreshold,1) *_Luminosity;
 
                 float4 terrainTex = tex2D(_TerrainMap, (i.positionWS.xz-terrainSizeOffset.zw)/terrainSizeOffset.xy);
-                float4 gradientColor = lerp(terrainTex*mainTex/float4( mainSpecularLight,1) + _BottomColor,  (terrainTex*mainTex*_TopIntensity+_TopColor), saturate( i.uv.y-_BlendIntensity));
+                float4 gradientColor = lerp( (terrainTex*mainTex/float4( mainSpecularLight,1) + _BottomColor),  (terrainTex*mainTex+_TopColor), saturate( i.uv.y-_BlendIntensity));
+
+                gradientColor = lerp(gradientColor, gradientColor*_TopIntensity, i.uv.y);
 
                 LightingData lightingData = (LightingData)0;
                 float3 baseColor = gradientColor.rgb

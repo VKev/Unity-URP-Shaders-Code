@@ -51,7 +51,7 @@ Material:
     m_Floats:
     - _AnimationRenderDistance: 40
     - _BlendDistance: 0
-    - _BlendIntensity: 0.1
+    - _BlendIntensity: 0.146
     - _DarkThreshold: 0.6
     - _Gloss: 1
     - _InteractDistance: 0.8

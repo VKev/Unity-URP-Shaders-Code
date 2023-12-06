@@ -78,8 +78,8 @@ public class URP_BlinnPhong_Editor : ShaderGUI
             case ObjectType.TransparentBlend:
                 mat.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
                 mat.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
-                mat.SetInt("_ZWrite", 0);
-                mat.SetShaderPassEnabled("ShadowCaster", false);
+                mat.SetInt("_ZWrite", 1);
+                mat.SetShaderPassEnabled("ShadowCaster", true);
                 mat.DisableKeyword("_ALPHA_CUTOUT");
                 break;
             case ObjectType.TransparentCutout:

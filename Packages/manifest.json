@@ -1,12 +1,12 @@
 {
   "dependencies": {
     "com.unity.cinemachine": "2.9.7",
-    "com.unity.collab-proxy": "2.1.0",
+    "com.unity.collab-proxy": "2.2.0",
     "com.unity.feature.development": "1.0.2",
-    "com.unity.inputsystem": "1.7.0",
+    "com.unity.inputsystem": "1.8.0-pre.2",
     "com.unity.render-pipelines.universal": "17.0.1",
     "com.unity.terrain-tools": "5.1.0",
-    "com.unity.timeline": "1.8.5",
+    "com.unity.timeline": "1.8.6",
     "com.unity.ugui": "2.0.0",
     "com.unity.visualscripting": "1.9.1",
     "com.unity.modules.ai": "1.0.0",

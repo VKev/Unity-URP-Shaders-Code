@@ -61,7 +61,9 @@
             #pragma vertex vert
             #pragma fragment frag
 
-            #pragma multi_compile_instancing
+            #pragma target 4.5
+			#pragma multi_compile_instancing
+			#pragma multi_compile _ DOTS_INSTANCING_ON
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE
             #pragma multi_compile_fragment _ _SHADOWS_SOFT
 

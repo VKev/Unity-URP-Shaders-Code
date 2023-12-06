@@ -12,8 +12,6 @@
                 float3 deffuseLight = lambert;//*light.color * (light.distanceAttenuation * light.shadowAttenuation);
                 return deffuseLight;
             }
-            
-
 
             //*light.color * (light.distanceAttenuation * light.shadowAttenuation) : lightcolor of light
             float3 SpecularLight(float3 normal,float3 wPos, float _Gloss, Light light){
@@ -28,6 +26,11 @@
                 return specularLight;
             }
             #endif
+
+            void Unity_FresnelEffect_float(float3 Normal, float3 ViewDir, float Power, out float Out)
+            {
+                Out = pow((1.0 - saturate(dot(normalize(Normal), normalize(ViewDir)))), Power);
+            }
 
             float Random(float3 positionWS, float randomScale){
                 
@@ -67,16 +70,7 @@
                return transpose(float3x3(tangentWS, biTangentWS, normalWS ));
             }
 
-            float3 QuadScatter(float3x3 transposeTangent ,float2 uv, float random, float BlendScale, float FluffyScale){
-
-                float3 quadScatter = (mul(float3(2*uv-1,0), transposeTangent ).xyz);
-
-                quadScatter = mul(float4( quadScatter,0),unity_ObjectToWorld).xyz; 
-                quadScatter = normalize(quadScatter)*FluffyScale;
-                quadScatter = lerp(0,quadScatter,BlendScale);
-
-                return quadScatter;
-            }
+            
             
 
             float2 unity_gradientNoise_dir(float2 p)
