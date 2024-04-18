@@ -3,9 +3,6 @@ Using shader code, Non-shader graph
 
 Unity 2023.2.0b1
 
-## License
-Free, use any where you like. but not for commercial. 
-
 ## How to use
 #### For all shader:
     -Download and copy the VkevShaderLib.hlsl file in your assets folder (Impotant)
